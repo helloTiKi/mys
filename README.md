@@ -28,7 +28,7 @@ git clone --depth=1 https://gitee.com/yoimiya-kokomi/miao-plugin.git ./plugins/m
 ```
 
 2.安装[pnpm](https://pnpm.io/zh/installation) ，已安装的可以跳过
-  安装redis
+2.1安装redis
 ```
 # 使用npmjs.org安装
 npm install pnpm -g
