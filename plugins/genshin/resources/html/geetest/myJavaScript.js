@@ -12,7 +12,7 @@ window.getParams = (key) => {
     }
     return key == '' || key == undefined ? params : params[key]
 }
-async function _click(arr) {
+async function _nine(arr) {
     let dom = $('.geetest_item_ghost');
     if (dom.length !== 9) return;
 
@@ -22,7 +22,25 @@ async function _click(arr) {
     }
 }
 async function _word(arr) {
-    
+    let dom = $('.geetest_bg');
+    if (dom.length !== 1) return;
+    let { top, left } = dom.offset()
+    dom = dom[0];
+    for (const e of arr) {
+        let x = e[0], y = e[1];
+        console.log(x, y)
+        let mouseEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x + left,
+            clientY: y + top
+        })
+        dom.dispatchEvent(mouseEvent)
+        //dom[e - 1].click();
+        await sleep(500)
+    }
+    $('.geetest_submit').click()
 }
 async function sleep(ms) {
     await new Promise((resolve, reject) => {
@@ -36,6 +54,7 @@ function loggingDecorator(func) {
         console.log(`Calling function: ${func.name}`);
         const result = func.apply(this, arguments);
         console.log(arguments)
+        
         //console.log(`Function return value: ${result}`);
         return result;
     }
