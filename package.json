@@ -19,9 +19,26 @@
   "homepage": "https://github.com/helloTiKi/mys#readme",
   "type": "module",
   "dependencies": {
+    "art-template": "^4.13.2",
+    "axios": "^1.4.0",
+    "chalk": "^5.2.0",
     "chokidar": "^3.5.3",
-    "icqq": "^0.3.2",
+    "crypto": "^1.0.1",
+    "crypto-js": "^4.1.1",
+    "express": "^4.18.2",
+    "express-art-template": "^1.0.1",
+    "https-proxy-agent": "^6.1.0",
+    "icqq": "^0.2.0",
     "inquirer": "^9.2.2",
+    "lodash": "^4.17.21",
+    "log4js": "^6.9.1",
+    "md5": "^2.3.0",
+    "moment": "^2.29.4",
+    "node-fetch": "^3.3.1",
+    "node-schedule": "^2.1.1",
+    "node-xlsx": "^0.4.0",
+    "puppeteer": "^20.1.1",
+    "redis": "^4.6.6",
     "yaml": "^2.2.2"
   }
 }
