@@ -162,15 +162,16 @@ if (!global.mysCaptchaServer) {
         let data = (await axios.get('https://qifu-api.baidubce.com/ip/local/geo/v1/district')).data
         if (data.code == 'Success' || data.msg == "查询成功") {
             IPaddress = data.ip;
-            data = (await axios.get(`http://${data.ip}:${port}/Publicnetwork`)).data
-            if (data == 'OK') {
-                isPublicnetwork = true;
-                console.log(`当前ip:${IPaddress} 为可访问到本机的公网IP`)
-            } else {
-                isPublicnetwork = false;
-                console.log(`当前ip:${IPaddress} 为无法访问到本机的公网IP`)
-                IPaddress = '127.0.0.1'
-            }
+            axios.get(`http://${data.ip}:${port}/Publicnetwork`, { timeout: 5000 })
+                .then(e => {
+                    isPublicnetwork = true;
+                    console.log(`当前ip:${IPaddress} 为可访问到本机的公网IP`)
+                })
+                .catch(e => {
+                    isPublicnetwork = false;
+                    console.log(`当前ip:${IPaddress} 为无法访问到本机的外网IP\n设置为本地ip:127.0.0.1`)
+                    IPaddress = '127.0.0.1'
+                })
         } else {
             console.error('ip接口查询异常')
             console.info(JSON.stringify(data))

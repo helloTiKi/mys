@@ -10,45 +10,28 @@
 
 > 环境准备： Windows or Linux，Node.js（ [版本至少v16以上](http://nodejs.cn/download/) ）， [Redis](https://redis.io/docs/getting-started/installation/ )
 
-1.克隆项目并安装miao-plugin
+1.克隆项目
 
 请根据网络情况选择Github安装或Gitee安装
 
 ```
 # 使用 Github 
-git clone --depth=1 https://github.com/yoimiya-kokomi/Miao-Yunzai.git
-cd Miao-Yunzai 
-git clone --depth=1 https://github.com/yoimiya-kokomi/miao-plugin.git ./plugins/miao-plugin/
+git clone https://github.com/helloTiKi/mys.git
+cd mys 
 
 
 # 使用Gitee
-git clone --depth=1 https://gitee.com/yoimiya-kokomi/Miao-Yunzai.git
-cd Miao-Yunzai 
-git clone --depth=1 https://gitee.com/yoimiya-kokomi/miao-plugin.git ./plugins/miao-plugin/
+git clone https://github.com/helloTiKi/mys.git
+cd mys 
 ```
 
-2.安装[pnpm](https://pnpm.io/zh/installation) ，已安装的可以跳过
-2.1安装redis
-```
-# 使用npmjs.org安装
-npm install pnpm -g
-
-# 指定国内源npmmirror.com安装
-npm --registry=https://registry.npmmirror.com install pnpm -g
-```
-
-3.安装依赖
+2.安装依赖
 
 ```
-# 直接安装
-pnpm install -P
-
-# 如依赖安装缓慢或失败，可尝试更换国内npm源后再执行install命令
-pnpm config set registry https://registry.npmmirror.com
-pnpm install -P
+ npm i
 ```
 
-4.运行（首次运行按提示输入登录）
+3.运行（首次运行按提示输入登录）
 
 ```
 node app
