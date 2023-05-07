@@ -1,0 +1,20 @@
+{
+  "name": "mys",
+  "version": "1.0.0",
+  "description": "基于乐神版[云崽v3.0](https://gitee.com/le-niao/Yunzai-Bot) 改造\r ---\r * 由于是独立新的仓库，【只建议新部署/部署后迁移】，不建议原Bot直接换源强更\r * 使用icqq登录，防止oicq可能出现的低版本问题（如只需要此特性，可使用[Yunzai-V3](https://gitee.com/yoimiya-kokomi/Yunzai-Bot) )\r * 基础功能会保持与Yunzai同步迭代更新，如只需原版Yunzai功能则无需切换",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/helloTiKi/mys.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/helloTiKi/mys/issues"
+  },
+  "homepage": "https://github.com/helloTiKi/mys#readme"
+}
