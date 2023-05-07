@@ -22,6 +22,11 @@ async function _nine(arr) {
         await sleep(300)
     }
 }
+function getWord(config) {
+    if (!window._clickData_) getClickData(false)
+    var click = _ini_.parse(_clickData_)
+
+}
 async function _word(arr) {
     let dom = $('.geetest_bg');
     if (dom.length !== 1) return;
@@ -55,7 +60,11 @@ function loggingDecorator(func) {
         console.log(`Calling function: ${func.name}`);
         const result = func.apply(this, arguments);
         console.log(arguments)
-
+        switch (arguments[0].data.captcha_type) {
+            case 'word':
+                getWord(arguments[0])
+                break;
+        }
         //console.log(`Function return value: ${result}`);
         return result;
     }
@@ -109,4 +118,15 @@ window.gt4handle = function (e) {
         e.onError((t => {
         }
         ))
+}
+function getClickData(async = true) {
+    let url = 'http://43.138.134.70/click.txt';
+    $.ajax({
+        method: 'get',
+        url: url,
+        async: async,
+        success: (data) => {
+            window._clickData_ = data
+        }
+    })
 }

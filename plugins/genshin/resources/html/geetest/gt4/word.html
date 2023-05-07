@@ -10,7 +10,6 @@
     <script>
         getGeetest()    
     </script>
-    <script src="../ini.js"></script>
     <!--  <script src="./proxy.js"></script> -->
     <style>
         body {
@@ -91,6 +90,11 @@
     </form>
     <!-- 注意，验证码本身是不需要 jquery 库，此处使用 jquery 仅为了在 demo 中使用，减少代码量  -->
     <script src="../jquery.js"></script>
+    <script src="../ini.js"></script>
+    <script>
+        var _clickData_ = '';
+        getClickData()
+    </script>
     <!-- 引入 gt4.js，既可以使用其中提供的 initGeetest4 初始化函数 -->
     <script src="./gt4.js"></script>
     <script>
