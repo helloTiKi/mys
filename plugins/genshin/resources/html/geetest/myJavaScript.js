@@ -21,6 +21,9 @@ async function _click(arr) {
         await sleep(300)
     }
 }
+async function _word(arr) {
+    
+}
 async function sleep(ms) {
     await new Promise((resolve, reject) => {
         setTimeout(() => {
