@@ -7,7 +7,7 @@ import MysUser from './mys/MysUser.js'
 import MysInfo from './mys/mysInfo.js'
 
 export default class User extends base {
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'bingCk'
     /** 绑定的uid */
@@ -18,17 +18,17 @@ export default class User extends base {
   }
 
   // 获取当前user实例
-  async user () {
+  async user() {
     return await MysInfo.getNoteUser(this.e)
   }
 
-  async resetCk () {
+  async resetCk() {
     let user = await this.user()
     await user.initCache()
   }
 
   /** 绑定ck */
-  async bing () {
+  async bing() {
     let user = await this.user()
     let set = gsCfg.getConfig('mys', 'set')
 
@@ -116,7 +116,7 @@ export default class User extends base {
   }
 
   /** 检查ck是否可用 */
-  async checkCk (param) {
+  async checkCk(param) {
     let res
     for (let type of ['mys', 'hoyolab']) {
       let roleRes = await this.getGameRoles(type)
@@ -163,17 +163,17 @@ export default class User extends base {
     return this.uid
   }
 
-  async getGameRoles (server = 'mys') {
+  async getGameRoles(server = 'mys') {
     return await MysUser.getGameRole(this.ck, server)
   }
 
   // 获取米游社通行证id
-  async getUserInfo (server = 'mys') {
+  async getUserInfo(server = 'mys') {
     return await MysUser.getUserFullInfo(this.ck, server)
   }
 
   /** 保存ck */
-  getCk () {
+  getCk() {
     let ck = gsCfg.getBingCkSingle(this.e.user_id)
 
     lodash.map(ck, o => {
@@ -206,14 +206,14 @@ export default class User extends base {
   }
 
   /** 删除绑定ck */
-  async delCk (uid = '') {
+  async delCk(uid = '') {
     let user = await this.user()
     let uids = await user.delCk()
     return `绑定cookie已删除,uid:${uids.join(',')}`
   }
 
   /** 绑定uid，若有ck的话优先使用ck-uid */
-  async bingUid () {
+  async bingUid() {
     let uid = this.e.msg.match(/[1|2|5-9][0-9]{8}/g)
     if (!uid) return
     uid = uid[0]
@@ -223,7 +223,7 @@ export default class User extends base {
   }
 
   /** #uid */
-  async showUid () {
+  async showUid() {
     let user = await this.user()
 
     if (!user.hasCk) {
@@ -244,7 +244,7 @@ export default class User extends base {
   }
 
   /** 切换uid */
-  async toggleUid (index) {
+  async toggleUid(index) {
     let user = await this.user()
     let uidList = user.ckUids
     if (index > uidList.length) {
@@ -256,7 +256,7 @@ export default class User extends base {
   }
 
   /** 加载旧ck */
-  async loadOldData () {
+  async loadOldData() {
     let file = [
       './data/MysCookie/NoteCookie.json',
       './data/NoteCookie/NoteCookie.json',
@@ -311,7 +311,7 @@ export default class User extends base {
   }
 
   /** 我的ck */
-  async myCk () {
+  async myCk() {
     let user = await this.user()
     if (!user.hasCk) {
       this.e.reply('当前尚未绑定cookie')
@@ -324,7 +324,7 @@ export default class User extends base {
     }
   }
 
-  async checkCkStatus () {
+  async checkCkStatus() {
     let user = await this.user()
     if (!user.hasCk) {
       await this.e.reply(`\n未绑定CK，当前绑定uid：${user.uid || '无'}`, false, { at: true })
@@ -356,15 +356,15 @@ export default class User extends base {
     await this.e.reply(cks.join('\n----\n'), false, { at: true })
   }
 
-  getGuid () {
-    function S4 () {
+  getGuid() {
+    function S4() {
       return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
     }
 
     return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4())
   }
 
-  async userAdmin () {
+  async userAdmin() {
     this.model = 'userAdmin'
     await MysInfo.initCache()
     let stat = await MysUser.getStatData()

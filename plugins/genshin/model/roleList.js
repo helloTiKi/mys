@@ -6,7 +6,7 @@ import lodash from 'lodash'
 import common from '../../../lib/common/common.js'
 
 export default class RoleList extends base {
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'roleList'
 
@@ -14,12 +14,12 @@ export default class RoleList extends base {
     this.cacheCd = 30
   }
 
-  static async get (e) {
+  static async get(e) {
     let roleList = new RoleList(e)
     return await roleList.getData()
   }
 
-  async getData () {
+  async getData() {
     let res = await MysInfo.get(this.e, 'character')
     if (!res || res.retcode !== 0) return false
 
@@ -49,7 +49,7 @@ export default class RoleList extends base {
     return data
   }
 
-  async getAllSkill (avatars) {
+  async getAllSkill(avatars) {
     let skillRet = []; let skill = []
     // 批量获取技能数据，分组10个id一次，延迟100ms
     let num = 10; let ms = 100
@@ -74,7 +74,7 @@ export default class RoleList extends base {
     return skill
   }
 
-  async getSkill (avatar) {
+  async getSkill(avatar) {
     let force = !this.e.msg.includes('force')
     let res = await this.mysApi.getData('detail', { avatar_id: avatar.id }, force)
     if (!res || res.retcode !== 0 || !res.data.skill_list) return false
@@ -123,7 +123,7 @@ export default class RoleList extends base {
     return skill
   }
 
-  dealData (avatars, skill) {
+  dealData(avatars, skill) {
     let daily = gsCfg.getdefSet('daily', 'daily')
 
     const displayMode = /(角色|武器|练度)/.test(this.e.msg) ? 'weapon' : 'talent'

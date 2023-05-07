@@ -1,6 +1,7 @@
 import mysCaptchaServer from "./mysCapchp.server.js";
 import axios from 'axios'
 import cmd from 'child_process';
+let path = './plugins/genshin/resources/html/geetest/极验模拟验证.exe';
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -18,7 +19,7 @@ async function isStart() {
             if (Frist) {
                 Frist = false;
                 console.log('正在启动图形服务器')
-                cmd.exec('Start-Process', { shell: 'G:\\数据\\易语言\\易语言源码\\杂项\\原神辅助功能\\极验模拟验证.exe' })
+                cmd.exec('Start-Process', { shell: path })
                 for (let i = 0; i < 3; i++) {
                     await sleep(5000)
                     if (await isStart()) {
@@ -49,13 +50,11 @@ export default class geetest {
             throw '图片服务异常'
         }
         let ret = this.server.getCaptchaHtmlUrl(this.config.gt, this.config.challenge)
-        console.log(ret.index_url)
         let data = await axios.get('http://127.0.0.1:4400/check', {
             headers: {
-                geetest: ret.index_url
+                geetest: ret.url
             }
         })
-        
         let _data = data.data;
         if (_data.code == 0) {
             return _data.data

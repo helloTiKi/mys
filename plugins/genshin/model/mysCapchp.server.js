@@ -1,10 +1,13 @@
 import http from 'http'
 import CryptoJS from 'crypto-js'
 import fs from 'node:fs'
+//import axios from 'axios'
 import axios from 'axios'
 //debugger
 let path = './plugins/genshin/resources/html/geetest'
 let port = 4399;
+let isPublicnetwork = false;
+let IPaddress = '127.0.0.1';
 var getHtmlData = typeof getHtmlData == 'function' ? getHtmlData : function e(s) {
     let data = {};
     function get(key) {
@@ -28,6 +31,7 @@ Captcha.prototype = {
         this.CaptchaData[key] = {
             gt: gt,
             challenge: cg,
+            type: cg == '' ? 4 : 3,
             Validate: {
                 geetest_challenge: '',
                 geetest_validate: '',
@@ -49,7 +53,7 @@ Captcha.prototype = {
     },
     newCaptcha: async function () {
         let url = 'https://www.geetest.com/demo/gt/register-click-official?t=' + new Date().getTime();
-        let data = await axios.get(url);
+        let data = await axios.get(url)
         data = data.data;
         return this.setCaptcha(data.gt, data.challenge);
         debugger
@@ -122,6 +126,9 @@ if (!global.mysCaptchaServer) {
                     retdata.data = data || {}
                     res.end(JSON.stringify(retdata))
                     break;
+                case '/Publicnetwork':
+                    res.end('OK')
+                    break;
                 case '/newCaptcha':
                     data = captcha.setCaptcha(params.gt, params.challenge)
                     res.end(data)
@@ -149,7 +156,26 @@ if (!global.mysCaptchaServer) {
         //res.end("success")
     });
     global.mysCaptchaServer = server
-    server.listen(port, '',)
+    global.mysCaptchaServer.listen(port, '',)
+    new Promise(async (res, rej) => {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        let data = (await axios.get('https://qifu-api.baidubce.com/ip/local/geo/v1/district')).data
+        if (data.code == 'Success' || data.msg == "查询成功") {
+            IPaddress = data.ip;
+            data = (await axios.get(`http://${data.ip}:${port}/Publicnetwork`)).data
+            if (data == 'OK') {
+                isPublicnetwork = true;
+                console.log(`当前ip:${IPaddress} 为可访问到本机的公网IP`)
+            } else {
+                isPublicnetwork = false;
+                console.log(`当前ip:${IPaddress} 为无法访问到本机的公网IP`)
+                IPaddress = '127.0.0.1'
+            }
+        } else {
+            console.error('ip接口查询异常')
+            console.info(JSON.stringify(data))
+        }
+    })
 }
 if (!global.mysCaptchaData) {
     var captcha = new Captcha();
@@ -158,12 +184,12 @@ if (!global.mysCaptchaData) {
 export default class mysCaptchaServer {
     constructor() {
         this.captcha = global.mysCaptchaData;
+        this.host = IPaddress + ":" + port;
     }
     getCaptchaHtmlUrl(gt, challenge) {
         let sign = this.captcha.setCaptcha(gt, challenge);
         return {
-            url: 'https://63644z2547.picp.vip/index.html?sign=' + sign,
-            index_url: `http://127.0.0.1:${port}/index.html?sign=` + sign,
+            url: `http://${this.host}/index.html?sign=` + sign,
             sign: sign
         }
     }

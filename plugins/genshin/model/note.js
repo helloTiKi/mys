@@ -4,18 +4,18 @@ import base from './base.js'
 import MysInfo from './mys/mysInfo.js'
 
 export default class Note extends base {
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'dailyNote'
   }
 
   /** 生成体力图片 */
-  static async get (e) {
+  static async get(e) {
     let note = new Note(e)
     return await note.getData()
   }
 
-  async getData () {
+  async getData() {
     let res = await MysInfo.get(this.e, 'dailyNote')
 
     if (!res || res.retcode !== 0) return false
@@ -28,7 +28,7 @@ export default class Note extends base {
     }
   }
 
-  noteData (res) {
+  noteData(res) {
     let { data } = res
 
     let nowDay = moment().date()

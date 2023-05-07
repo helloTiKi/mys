@@ -1,13 +1,12 @@
-
 export default class base {
-  constructor (e = {}) {
+  constructor(e = {}) {
     this.e = e
     this.userId = e?.user_id
     this.model = 'genshin'
     this._path = process.cwd().replace(/\\/g, '/')
   }
 
-  get prefix () {
+  get prefix() {
     return `Yz:genshin:${this.model}:`
   }
 
@@ -17,7 +16,7 @@ export default class base {
    * @param tplFile 模板html路径
    * @param pluResPath 插件资源路径
    */
-  get screenData () {
+  get screenData() {
     let headImg = '八重神子'
 
     return {

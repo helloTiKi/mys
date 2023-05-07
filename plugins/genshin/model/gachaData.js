@@ -12,7 +12,7 @@ export default class GachaData extends base {
    * @param e oicq 消息e
    * @param e.user_id 用户id
    */
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'gacha'
     /** 卡池 */
@@ -32,7 +32,7 @@ export default class GachaData extends base {
     this.fourHave = []
   }
 
-  static async init (e) {
+  static async init(e) {
     let gacha = new GachaData(e)
     gacha.initFile()
     /** 抽卡类型 */
@@ -46,7 +46,7 @@ export default class GachaData extends base {
   }
 
   /** 抽卡 */
-  async run () {
+  async run() {
     let list = this.lottery()
 
     /** 截图数据 */
@@ -61,7 +61,7 @@ export default class GachaData extends base {
     return data
   }
 
-  get key () {
+  get key() {
     /** 群，私聊分开 */
     if (this.e.isGroup) {
       return `${this.prefix}${this.e.group_id}:${this.userId}`
@@ -70,14 +70,14 @@ export default class GachaData extends base {
     }
   }
 
-  getTpye () {
+  getTpye() {
     if (this.e.msg.includes('2')) this.role2 = true
     if (this.e.msg.includes('武器')) this.type = 'weapon'
     if (this.e.msg.includes('常驻')) this.type = 'permanent'
   }
 
   /** 奖池数据 */
-  async getPool () {
+  async getPool() {
     let poolArr = gsCfg.getdefSet('gacha', 'pool')
     poolArr = [...poolArr].reverse()
     /** 获取设置卡池 */
@@ -133,7 +133,7 @@ export default class GachaData extends base {
   }
 
   /** 用户数据 */
-  async userData () {
+  async userData() {
     if (this.user) return this.user
 
     let user = await redis.get(this.key)
@@ -173,7 +173,7 @@ export default class GachaData extends base {
   /**
    * 抽奖
    */
-  lottery (save = true) {
+  lottery(save = true) {
     /** 十连抽 */
     for (let i = 1; i <= 10; i++) {
       this.index = i
@@ -199,7 +199,7 @@ export default class GachaData extends base {
     return this.res
   }
 
-  lottery5 () {
+  lottery5() {
     /** 是否大保底 */
     let isBigUP = false
     let isBing = false
@@ -297,7 +297,7 @@ export default class GachaData extends base {
     return true
   }
 
-  lottery4 () {
+  lottery4() {
     let tmpChance4 = this.def.chance4
 
     /** 四星保底 */
@@ -368,7 +368,7 @@ export default class GachaData extends base {
     return true
   }
 
-  lottery3 () {
+  lottery3() {
     /** 随机三星武器 */
     let tmpName = lodash.sample(this.pool.weapon3)
     this.res.push({
@@ -383,7 +383,7 @@ export default class GachaData extends base {
     return true
   }
 
-  probability () {
+  probability() {
     let tmpChance5 = this.def.chance5
 
     if (this.type == 'role' || this.type == 'permanent') {
@@ -396,10 +396,10 @@ export default class GachaData extends base {
       if (this.user[this.type].num5 >= 90) {
         tmpChance5 = 10000
       } else if (this.user[this.type].num5 >= 74) {
-      /** 74抽之后逐渐增加概率 */
+        /** 74抽之后逐渐增加概率 */
         tmpChance5 = 590 + (this.user[this.type].num5 - 74) * 530
       } else if (this.user[this.type].num5 >= 60) {
-      /** 60抽之后逐渐增加概率 */
+        /** 60抽之后逐渐增加概率 */
         tmpChance5 = this.def.chance5 + (this.user[this.type].num5 - 50) * 40
       }
     }
@@ -430,7 +430,7 @@ export default class GachaData extends base {
   }
 
   /** 获取定轨的武器 */
-  getBingWeapon (sortName = false) {
+  getBingWeapon(sortName = false) {
     if (this.type != 'weapon') return false
 
     let name = this.pool.up5[this.user[this.type].type - 1]
@@ -440,7 +440,7 @@ export default class GachaData extends base {
     return name
   }
 
-  lotteryInfo () {
+  lotteryInfo() {
     let info = `累计「${this.user[this.type].num5}抽」`
     let nowFive = 0
     let nowFour = 0
@@ -480,14 +480,14 @@ export default class GachaData extends base {
     return res
   }
 
-  async saveUser () {
+  async saveUser() {
     this.user.today.expire = this.getEnd().end4
     await redis.setEx(this.key, 3600 * 24 * 14, JSON.stringify(this.user))
   }
 
-  static async getStr () {
+  static async getStr() {
     global.strr = ''
-    let res = await fetch('https://gist.githubusercontent.com/Le-niao/10f061fb9fe8fcfc316c10b422ed06d1/raw/Yunzai-Bot').catch(() => {})
+    let res = await fetch('https://gist.githubusercontent.com/Le-niao/10f061fb9fe8fcfc316c10b422ed06d1/raw/Yunzai-Bot').catch(() => { })
     if (res && res.text) {
       let strr = await res.text() || ''
       if (strr.includes('html')) strr = ''
@@ -495,11 +495,11 @@ export default class GachaData extends base {
     }
   }
 
-  getNow () {
+  getNow() {
     return moment().format('X')
   }
 
-  getEnd () {
+  getEnd() {
     let end = moment().endOf('day').format('X')
     let end4 = 3600 * 4
     if (moment().format('k') < 4) {
@@ -510,11 +510,11 @@ export default class GachaData extends base {
     return { end, end4 }
   }
 
-  getWeekEnd () {
+  getWeekEnd() {
     return Number(moment().day(7).endOf('day').format('X'))
   }
 
-  initFile () {
+  initFile() {
     if (imgFile['刻晴']) return imgFile
     let path = './plugins/genshin/resources/img/gacha/'
     let character = fs.readdirSync(path + 'character/')

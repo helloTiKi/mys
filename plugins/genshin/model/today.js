@@ -7,12 +7,12 @@ import gsCfg from './gsCfg.js'
 import common from '../../../lib/common/common.js'
 
 export default class Today extends base {
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'todayMaterial'
   }
 
-  async getData () {
+  async getData() {
     if (moment().day() == 0 && moment().hour() > 4) {
       this.e.reply('今天周日，全部素材都可以刷哦~')
       return false
@@ -26,7 +26,7 @@ export default class Today extends base {
     return await this.todayData(avatars)
   }
 
-  async todayData (avatars) {
+  async todayData(avatars) {
     let daily = gsCfg.getdefSet('daily', 'daily')
     let other = gsCfg.getdefSet('weapon', 'other')
     // 除周日日期余三
@@ -60,7 +60,7 @@ export default class Today extends base {
 
         b:
         for (let val of avatars) {
-        // 进行天赋的数据处理
+          // 进行天赋的数据处理
           if ((temp.isTalent) && (element.indexOf(val.name) != -1)) {
             role.push(val)
             let rarity = val.rarity
@@ -172,7 +172,7 @@ export default class Today extends base {
     }
   }
 
-  async getAllSkill (avatars) {
+  async getAllSkill(avatars) {
     let skillRet = []; let skill = []
     // 批量获取技能数据，分组10个id一次，延迟100ms
     let num = 10; let ms = 100
@@ -197,7 +197,7 @@ export default class Today extends base {
     return skill
   }
 
-  async getSkill (avatar) {
+  async getSkill(avatar) {
     let force = !this.e.msg.includes('force')
     let res = await this.mysApi.getData('detail', { avatar_id: avatar.id }, force)
     if (!res || res.retcode !== 0 || !res.data.skill_list) return false

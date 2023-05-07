@@ -24,11 +24,27 @@ export default class MysApi {
       log: true,
       ...option
     }
-  }
+    this.UserGameRoles = {};
 
+  }
+  async getUserGameRoles(game_biz = '') {
+    let th = this;
+    function isEmptyObj(obj) {
+      return Object.keys(obj).length === 0;
+    }
+    if (isEmptyObj(this.UserGameRoles)) {
+      let data = await this.getData('getUserGameRoles');
+      if (data.retcode != 0) throw data.message;
+      let list = data.data.list;
+      list.forEach(obj => {
+        th.UserGameRoles[obj.game_biz] = obj;
+      })
+    }
+    return this.UserGameRoles[game_biz];
+  }
   getUrl(type, data = {}) {
     let host, hostRecord
-    if (['cn_gf01', 'cn_qd01'].includes(this.server)) {
+    if (['cn_gf01', 'cn_qd01', 'prod_gf_cn'].includes(this.server)) {
       host = 'https://api-takumi.mihoyo.com/'
       hostRecord = 'https://api-takumi-record.mihoyo.com/'
     } else if (['os_usa', 'os_euro', 'os_asia', 'os_cht'].includes(this.server)) {
@@ -81,17 +97,17 @@ export default class MysApi {
       },
       /**星穹列车签到信息 */
       luna_sign_info: {
-        url: `${hostRecord}event/luna/info`,
+        url: `${host}event/luna/info`,
         query: `lang=zh-cn&act_id=e202304121516551&region=prod_gf_cn&uid=${this.uid}`
       },
       /**星穹列车签到奖励 */
       luna_sign_home: {
-        url: `${hostRecord}event/luna/home`,
+        url: `${host}event/luna/home`,
         query: 'lang=zh-cn&act_id=e202304121516551'
       },
       /**星穹签到 */
       luna_sign: {
-        url: `${hostRecord}event/luna/sign`,
+        url: `${host}event/luna/sign`,
         body: { act_id: 'e202304121516551', region: 'prod_gf_cn', uid: this.uid, lang: 'zh-cn' },
         sign: true
       },
@@ -224,10 +240,6 @@ export default class MysApi {
     }
     return 'cn_gf01'
   }
-  async getUserGameRoles() {
-
-
-  }
 
   async getData(type, data = {}, cached = false) {
     let { url, headers, body } = this.getUrl(type, data)
@@ -236,7 +248,7 @@ export default class MysApi {
 
     let cacheKey = this.cacheKey(type, data)
     let cahce = await redis.get(cacheKey)
-    if (cahce && !cached) return JSON.parse(cahce)
+    if (cahce) return JSON.parse(cahce)
 
     headers.Cookie = this.cookie
 

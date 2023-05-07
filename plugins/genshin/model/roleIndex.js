@@ -8,7 +8,7 @@ import fs from 'node:fs'
 let imgFile = {}
 
 export default class RoleIndex extends base {
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'roleIndex'
     this.other = gsCfg.getdefSet('role', 'other')
@@ -30,12 +30,12 @@ export default class RoleIndex extends base {
     this.headIndexStyle = `<style> .head_box { background: url(${this.screenData.pluResPath}img/roleIndex/namecard/${lodash.random(1, 8)}.png) #f5f5f5; background-position-x: 30px; background-repeat: no-repeat; border-radius: 15px; font-family: tttgbnumber; padding: 10px 20px; position: relative; background-size: auto 101%; }</style>`
   }
 
-  static async get (e) {
+  static async get(e) {
     let roleIndex = new RoleIndex(e)
     return await roleIndex.getIndex()
   }
 
-  async getIndex () {
+  async getIndex() {
     let ApiData = {
       index: '',
       spiralAbyss: { schedule_type: 1 },
@@ -59,7 +59,7 @@ export default class RoleIndex extends base {
     return data
   }
 
-  dealData (data) {
+  dealData(data) {
     let [resIndex, resAbyss, resDetail, basicInfo] = data
 
     let avatars = resDetail.avatars || []
@@ -118,11 +118,11 @@ export default class RoleIndex extends base {
         {
           lable: '总宝箱',
           num:
-          stats.precious_chest_number +
-          stats.luxurious_chest_number +
-          stats.exquisite_chest_number +
-          stats.common_chest_number +
-          stats.magic_chest_number
+            stats.precious_chest_number +
+            stats.luxurious_chest_number +
+            stats.exquisite_chest_number +
+            stats.common_chest_number +
+            stats.magic_chest_number
         }
       ],
       [
@@ -165,7 +165,7 @@ export default class RoleIndex extends base {
     line.push(explor2)
 
     if (avatars.length > 0) {
-    // 重新排序
+      // 重新排序
       avatars = lodash.chain(avatars).orderBy(['sortLevel'], ['desc'])
       if (this.e.msg.includes('角色')) {
         avatars = avatars.slice(0, 12)
@@ -189,7 +189,7 @@ export default class RoleIndex extends base {
   }
 
   // 处理深渊数据
-  abyssAll (roleArr, resAbyss) {
+  abyssAll(roleArr, resAbyss) {
     let abyss = {}
 
     if (roleArr.length <= 0) {
@@ -276,7 +276,7 @@ export default class RoleIndex extends base {
     }
   }
 
-  dayCount (num) {
+  dayCount(num) {
     let year = Math.floor(num / 365)
     let month = Math.floor((num % 365) / 30.41)
     let day = Math.floor((num % 365) % 30.41)
@@ -293,7 +293,7 @@ export default class RoleIndex extends base {
     return msg
   }
 
-  async roleCard () {
+  async roleCard() {
     this.model = 'roleCard'
     let res = await MysInfo.get(this.e, 'index')
 
@@ -302,7 +302,7 @@ export default class RoleIndex extends base {
     return this.roleCardData(res.data)
   }
 
-  roleCardData (res) {
+  roleCardData(res) {
     this.initFile()
 
     let stats = res.stats
@@ -384,7 +384,7 @@ export default class RoleIndex extends base {
     }
   }
 
-  async roleExplore () {
+  async roleExplore() {
     this.model = 'roleExplore'
     let res = await MysInfo.get(this.e, 'index')
 
@@ -393,7 +393,7 @@ export default class RoleIndex extends base {
     return this.roleExploreData(res.data)
   }
 
-  roleExploreData (res) {
+  roleExploreData(res) {
     let stats = res.stats
     let line = [
       [
@@ -403,11 +403,11 @@ export default class RoleIndex extends base {
         {
           lable: '总宝箱',
           num:
-          stats.precious_chest_number +
-          stats.luxurious_chest_number +
-          stats.exquisite_chest_number +
-          stats.common_chest_number +
-          stats.magic_chest_number
+            stats.precious_chest_number +
+            stats.luxurious_chest_number +
+            stats.exquisite_chest_number +
+            stats.common_chest_number +
+            stats.magic_chest_number
         }
       ],
       [
@@ -498,7 +498,7 @@ export default class RoleIndex extends base {
     }
   }
 
-  initFile () {
+  initFile() {
     if (imgFile['刻晴']) return imgFile
     let path = './plugins/genshin/resources/img/gacha/'
     let character = fs.readdirSync(path + 'character/')

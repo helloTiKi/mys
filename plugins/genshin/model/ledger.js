@@ -7,12 +7,12 @@ import fs from 'node:fs'
 import common from '../../../lib/common/common.js'
 
 export default class Ledger extends base {
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'ledger'
   }
 
-  async get () {
+  async get() {
     this.getMonth()
     if (!this.month) return
 
@@ -27,7 +27,7 @@ export default class Ledger extends base {
     return data
   }
 
-  getMonth () {
+  getMonth() {
     let month = this.e.msg.replace(/#|原石|月|札记/g, '')
     let NowMonth = Number(moment().month()) + 1
     let monthData = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二']
@@ -64,7 +64,7 @@ export default class Ledger extends base {
     this.month = month
   }
 
-  dealData (ledgerInfo) {
+  dealData(ledgerInfo) {
     let day
     if (this.month == this.NowMonth) {
       day = `${this.month}月${moment().date()}号`
@@ -114,7 +114,7 @@ export default class Ledger extends base {
   }
 
   // 保存上两个原石数据
-  async saveLedger (uid, ck = '') {
+  async saveLedger(uid, ck = '') {
     if (ck) {
       uid = ck.uid
     } else {
@@ -172,7 +172,7 @@ export default class Ledger extends base {
     return NoteData
   }
 
-  async ysLedger (ck, month) {
+  async ysLedger(ck, month) {
     let mysApi = new MysApi(ck.uid, ck.ck, { log: false })
 
     let ledgerInfo = await mysApi.getData('ys_ledger', { month })
@@ -182,7 +182,7 @@ export default class Ledger extends base {
     return ledgerInfo.data
   }
 
-  async ledgerTask (manual) {
+  async ledgerTask(manual) {
     let cks = await MysInfo.getBingCkUid()
     let uids = lodash.map(cks, 'uid')
     let finishTime = moment().add(uids.length * 0.7, 's').format('MM-DD HH:mm:ss')
@@ -206,7 +206,7 @@ export default class Ledger extends base {
     }
   }
 
-  countTime (num) {
+  countTime(num) {
     let time = num * 0.7
     let hour = Math.floor((time / 3600) % 24)
     let min = Math.floor((time / 60) % 60)
@@ -218,7 +218,7 @@ export default class Ledger extends base {
     return msg
   }
 
-  async ledgerCount () {
+  async ledgerCount() {
     this.model = 'ledgerCount'
 
     let mysInfo = await MysInfo.init(this.e, 'ys_ledger')
@@ -231,7 +231,7 @@ export default class Ledger extends base {
     return this.ledgerCountData(NoteData)
   }
 
-  async ledgerCountHistory () {
+  async ledgerCountHistory() {
     let nowYear
     if (this.e.msg.includes('去年')) {
       nowYear = moment().year() - 1
@@ -273,7 +273,7 @@ export default class Ledger extends base {
     return this.ledgerCountData(NoteData, String(nowYear))
   }
 
-  ledgerCountData (NoteData, nowYear) {
+  ledgerCountData(NoteData, nowYear) {
     let hasMore = false
     let yearText
     if (!nowYear) {

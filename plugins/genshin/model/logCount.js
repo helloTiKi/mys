@@ -5,7 +5,7 @@ import gsCfg from './gsCfg.js'
 import moment from 'moment'
 
 export default class LogCount extends base {
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'logCount'
 
@@ -28,11 +28,11 @@ export default class LogCount extends base {
   }
 
   // 读取本地json
-  readJson () {
+  readJson() {
     let logJson = []; let ids = []
     let file = `${this.path}/${this.uid}/${this.type}.json`
     if (fs.existsSync(file)) {
-    // 获取本地数据 进行数据合并
+      // 获取本地数据 进行数据合并
       logJson = JSON.parse(fs.readFileSync(file, 'utf8'))
       for (let val of logJson) {
         if (val.id) {
@@ -45,7 +45,7 @@ export default class LogCount extends base {
   }
 
   /** #抽卡统计 */
-  async count () {
+  async count() {
     /** 卡池 */
     this.getPool()
 
@@ -68,7 +68,7 @@ export default class LogCount extends base {
     }
   }
 
-  getPool () {
+  getPool() {
     let msg = this.e.msg.replace(/#|抽卡|统计|池/g, '')
     this.type = 301
     this.typeName = '角色'
@@ -91,7 +91,7 @@ export default class LogCount extends base {
     }
   }
 
-  async getUid () {
+  async getUid() {
     if (!fs.existsSync(this.path)) {
       this.e.reply('暂无抽卡记录\n#记录帮助，查看配置说明', false, { at: true })
       return false
@@ -138,7 +138,7 @@ export default class LogCount extends base {
     return uidArr[0].uid
   }
 
-  getPoolCfg () {
+  getPoolCfg() {
     let poolCfg = gsCfg.getdefSet('pool', this.type)
 
     poolCfg.forEach(v => {
@@ -150,7 +150,7 @@ export default class LogCount extends base {
   }
 
   /** 统计计算记录 */
-  analyseHistory () {
+  analyseHistory() {
     let all = this.readJson().list
     all = all.reverse()
 

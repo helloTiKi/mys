@@ -8,20 +8,20 @@ import fetch from 'node-fetch'
 import common from '../../../lib/common/common.js'
 
 export default class RoleDetail extends base {
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'roleDetail'
 
     this.path = './data/roleDetail/'
   }
 
-  static async get (e) {
+  static async get(e) {
     if (!e.roleName) return false
     let roleDetail = new RoleDetail(e)
     return await roleDetail.getDetail()
   }
 
-  async getDetail () {
+  async getDetail() {
     let character = await MysInfo.get(this.e, 'character')
     let detail = await MysInfo.get(this.e, 'detail', { avatar_id: this.e.roleId })
 
@@ -52,7 +52,7 @@ export default class RoleDetail extends base {
     return data
   }
 
-  async getAvatar (data) {
+  async getAvatar(data) {
     let avatars = lodash.keyBy(data.avatars, 'id')
 
     /** 旅行者特殊处理 */
@@ -150,7 +150,7 @@ export default class RoleDetail extends base {
     }
   }
 
-  async noAvatar () {
+  async noAvatar() {
     let msg = ''
     if (this.isBing) {
       let randFace = lodash.sample([26, 111, 110, 173, 177, 36, 37, 5, 9, 267, 264, 262, 265])
@@ -161,7 +161,7 @@ export default class RoleDetail extends base {
     await this.e.reply(msg, false, { at: true })
   }
 
-  getSkill (data = {}, avatar) {
+  getSkill(data = {}, avatar) {
     // if (!this.isBing) return {}
 
     let skill = {
@@ -207,7 +207,7 @@ export default class RoleDetail extends base {
     return skill
   }
 
-  async checkImg (name) {
+  async checkImg(name) {
     if (fs.existsSync(`${this.path}${name}1.png`)) return true
 
     let ret = await this.getData()
@@ -228,7 +228,7 @@ export default class RoleDetail extends base {
     return true
   }
 
-  async getData () {
+  async getData() {
     let url = 'https://bbs-api.mihoyo.com/post/wapi/getPostFullInCollection?&gids=2&collection_id=1057503'
 
     try {
@@ -242,7 +242,7 @@ export default class RoleDetail extends base {
     }
   }
 
-  async downImg (name, arr) {
+  async downImg(name, arr) {
     let ret = []
     arr.forEach((v, k) => ret.push(common.downFile(v, `${this.path}${name}${++k}.png`)))
 

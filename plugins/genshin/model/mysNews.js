@@ -10,12 +10,12 @@ const _path = process.cwd()
 let emoticon
 
 export default class MysNews extends base {
-  constructor (e) {
+  constructor(e) {
     super(e)
     this.model = 'mysNews'
   }
 
-  async getNews () {
+  async getNews() {
     let type = 1
     let typeName = '公告'
     if (this.e.msg.includes('资讯')) {
@@ -50,7 +50,7 @@ export default class MysNews extends base {
     return await this.replyMsg(img, `原神${typeName}：${param.data.post.subject}`)
   }
 
-  async rander (param) {
+  async rander(param) {
     const pageHeight = 7000
 
     await puppeteer.browserInit()
@@ -127,7 +127,7 @@ export default class MysNews extends base {
     }
   }
 
-  async newsDetail (postId) {
+  async newsDetail(postId) {
     const res = await this.postData('getPostFull', { gids: 2, read: 1, post_id: postId })
     if (!res) return
 
@@ -141,7 +141,7 @@ export default class MysNews extends base {
     }
   }
 
-  postApi (type, data) {
+  postApi(type, data) {
     let host = 'https://bbs-api-static.mihoyo.com/'
     let param = []
     lodash.forEach(data, (v, i) => param.push(`${i}=${v}`))
@@ -166,7 +166,7 @@ export default class MysNews extends base {
     return host + param
   }
 
-  async postData (type, data) {
+  async postData(type, data) {
     const url = this.postApi(type, data)
     const headers = {
       Referer: 'https://bbs.mihoyo.com/',
@@ -188,7 +188,7 @@ export default class MysNews extends base {
     return res
   }
 
-  async detalData (data) {
+  async detalData(data) {
     let json
     try {
       json = JSON.parse(data.post.content)
@@ -235,7 +235,7 @@ export default class MysNews extends base {
     return data
   }
 
-  async mysEmoticon () {
+  async mysEmoticon() {
     const emp = new Map()
 
     const res = await this.postData('emoticon', { gids: 2 })
@@ -255,7 +255,7 @@ export default class MysNews extends base {
     return emp
   }
 
-  async mysSearch () {
+  async mysSearch() {
     let msg = this.e.msg
     msg = msg.replace(/#|米游社|mys/g, '')
 
@@ -288,7 +288,7 @@ export default class MysNews extends base {
     return await this.replyMsg(img, `${param.data.post.subject}`)
   }
 
-  async mysUrl () {
+  async mysUrl() {
     let msg = this.e.msg
     let postId = /[0-9]+/g.exec(msg)[0]
 
@@ -301,7 +301,7 @@ export default class MysNews extends base {
     return await this.replyMsg(img, `${param.data.post.subject}`)
   }
 
-  async ysEstimate () {
+  async ysEstimate() {
     let msg = '版本原石盘点'
     let res = await this.postData('searchPosts', { gids: 2, size: 20, keyword: msg })
     if (res?.data?.posts.length <= 0) {
@@ -332,7 +332,7 @@ export default class MysNews extends base {
     return await this.replyMsg(img, `${param.data.post.subject}`)
   }
 
-  async replyMsg (img, titile) {
+  async replyMsg(img, titile) {
     if (!img || img.length <= 0) return false
     if (img.length == 1) {
       return img[0]
@@ -344,7 +344,7 @@ export default class MysNews extends base {
     }
   }
 
-  async mysNewsTask (type = 1) {
+  async mysNewsTask(type = 1) {
     let cfg = gsCfg.getConfig('mys', 'pushNews')
 
     // 推送2小时内的公告资讯
@@ -389,7 +389,7 @@ export default class MysNews extends base {
     }
   }
 
-  async sendNews (groupId, typeName, postId) {
+  async sendNews(groupId, typeName, postId) {
     if (!this.pushGroup[groupId]) this.pushGroup[groupId] = 0
     if (this.pushGroup[groupId] >= this.maxNum) return
 
