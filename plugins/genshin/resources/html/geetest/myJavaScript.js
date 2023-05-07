@@ -1,3 +1,4 @@
+
 window.getParams = (key) => {
     let url = document.location.href;
     let i = 0;
@@ -54,7 +55,7 @@ function loggingDecorator(func) {
         console.log(`Calling function: ${func.name}`);
         const result = func.apply(this, arguments);
         console.log(arguments)
-        
+
         //console.log(`Function return value: ${result}`);
         return result;
     }

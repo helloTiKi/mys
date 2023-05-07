@@ -28,6 +28,7 @@
     "express-art-template": "^1.0.1",
     "https-proxy-agent": "^6.1.0",
     "icqq": "^0.2.0",
+    "ini": "^4.1.0",
     "inquirer": "^9.2.2",
     "lodash": "^4.17.21",
     "log4js": "^6.9.1",
