@@ -82,16 +82,18 @@ if (!global.mysCaptchaServer) {
     console.log('正在启动验证服务')
     const server = http.createServer(function (req, res) {
         if (req.method == 'GET') {
-            var url = req.url;
-            var params = {};
-            var i = 0;
-            if (i = url.indexOf("?"), i != -1) {
-                let d = url.slice(i + 1, url.length);
-                url = url.slice(0, i)
-                d.split("&").forEach(e => {
-                    let key = e.split("=");
-                    params[key[0]] = key[1]
-                })
+            {
+                var url = req.url;
+                var params = {};
+                var i = 0;
+                if (i = url.indexOf("?"), i != -1) {
+                    let d = url.slice(i + 1, url.length);
+                    url = url.slice(0, i)
+                    d.split("&").forEach(e => {
+                        let key = e.split("=");
+                        params[key[0]] = key[1]
+                    })
+                }
             }
             let data;
             switch (url) {

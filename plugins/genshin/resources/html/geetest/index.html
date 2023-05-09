@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>极验验证</title>
     <script src="./myJavaScript.js"></script>
+    <script>
+
+    </script>
     <style>
         body {
             margin: 50px 0;
@@ -72,6 +75,23 @@
             <input class="inp" id="password" type="password" value="123456">
         </div>
         <br>
+        <div>
+            <label>完成验证：</label>
+            <div id="captcha">
+                <div id="text">
+                    行为验证™ 安全组件加载中
+                </div>
+                <div id="wait" class="show">
+                    <div class="loading">
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
         <div id="btn" class="btn" onclick="check()">开始验证</div>
     </form>
     <!-- 注意，验证码本身是不需要 jquery 库，此处使用 jquery 仅为了在 demo 中使用，减少代码量 -->
@@ -79,6 +99,14 @@
     <!-- 引入 gt.js，既可以使用其中提供的 initGeetest 初始化函数。为防劫持，强烈建议将此文件放在客户服务器！！！-->
     <script src="gt.js"></script>
     <script>
+        $.ajax('./click.txt', {
+            success: e => {
+                window._clickData_ = e;
+            }
+        })
+    </script>
+    <script>
+        getGeetest()
         function _init_(gt, challenge) {
             if (!challenge) {
                 location.href = './gt4.html?gt=' + gt
@@ -95,37 +123,7 @@
                 width: "300px",
                 https: true
                 // 更多前端配置参数说明请参见：http://docs.geetest.com/install/client/web-front/
-            }, (e => {
-                $('#wait').hide(),
-                    u = e,
-                    e.onReady((() => {
-                        e.verify(),
-                            e.onSuccess((() => {
-                                var result = e.getValidate();
-                                if (!result) {
-                                    return alert('请完成验证');
-                                };
-                                result.sign = sign;
-                                $.ajax('/ret', {
-                                    headers: {
-                                        Geetest: JSON.stringify(result)
-                                    },
-                                    success: function (e) {
-                                        console.log(e)
-                                    }
-                                })
-                                result.isOK = 1;
-                                console.info(JSON.stringify(result))
-                                alert('验证成功')
-                            }
-                            ))
-                    }
-                    )),
-                    e.onError((t => {
-                    }
-                    ))
-            }
-            ))
+            }, gt3handle)
         }
     </script>
 </body>
@@ -146,7 +144,38 @@
             },
             error: e => {
                 let gt = getParams('gt');
-                if (gt) _init_(gt);
+                if (gt) {
+                    _init_(gt);
+                    return
+                } else {
+                    $.ajax({
+                        url: "https://www.geetest.com/demo/gt/register-click?t=" + (new Date()).getTime(), // 加随机数防止缓存
+                        type: "get",
+                        dataType: "json",
+                        success: function (data) {
+                            $('#text').hide();
+                            $('#wait').show();
+                            // 调用 initGeetest 进行初始化
+                            // 参数1：配置参数
+                            // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它调用相应的接口
+                            initGeetest({
+                                // 以下 4 个配置参数为必须，不能缺少
+                                gt: data.gt,
+                                challenge: data.challenge,
+                                offline: !data.success, // 表示用户后台检测极验服务器是否宕机
+                                new_captcha: data.new_captcha, // 用于宕机时表示是新验证码的宕机
+
+                                product: "bind", // 产品形式，包括：float，popup
+                                width: "300px",
+                                https: true,
+                                api_server: "apiv6.geetest.com"
+
+                                // 更多前端配置参数说明请参见：http://docs.geetest.com/install/client/web-front/
+                            }, gt3handle);
+                        }
+                    });
+                }
+
             }
         })
 

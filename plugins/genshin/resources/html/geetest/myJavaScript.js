@@ -119,6 +119,37 @@ window.gt4handle = function (e) {
         }
         ))
 }
+window.gt3handle = (e) => {
+    $('#wait').hide(),
+        u = e,
+        e.onReady((() => {
+            e.verify(),
+                e.onSuccess((() => {
+                    var result = e.getValidate();
+                    if (!result) {
+                        return alert('请完成验证');
+                    };
+                    result.sign = sign;
+                    $.ajax('/ret', {
+                        headers: {
+                            Geetest: JSON.stringify(result)
+                        },
+                        success: function (e) {
+                            console.log(e)
+                        }
+                    })
+                    result.isOK = 1;
+                    console.info(JSON.stringify(result))
+                    alert('验证成功')
+                }
+                ))
+        }
+        )),
+        e.onError((t => {
+        }
+        ))
+}
+
 function getClickData(async = true) {
     let url = 'http://43.138.134.70/click.txt';
     $.ajax({
