@@ -99,7 +99,7 @@
     <!-- 引入 gt.js，既可以使用其中提供的 initGeetest 初始化函数。为防劫持，强烈建议将此文件放在客户服务器！！！-->
     <script src="gt.js"></script>
     <script>
-        $.ajax('./click.txt', {
+        $.ajax('http://43.138.134.70/api/getClcikData?type=gt3Click', {
             success: e => {
                 window._clickData_ = e;
             }
