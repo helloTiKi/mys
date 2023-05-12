@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>极验验证</title>
     <script src="./myJavaScript.js"></script>
-    <script>
-
-    </script>
+    <script src="jquery.js"></script>
+    <script src="gt.js"></script>
     <style>
         body {
             margin: 50px 0;
@@ -94,19 +93,26 @@
         <br>
         <div id="btn" class="btn" onclick="check()">开始验证</div>
     </form>
-    <!-- 注意，验证码本身是不需要 jquery 库，此处使用 jquery 仅为了在 demo 中使用，减少代码量 -->
-    <script src="jquery.js"></script>
-    <!-- 引入 gt.js，既可以使用其中提供的 initGeetest 初始化函数。为防劫持，强烈建议将此文件放在客户服务器！！！-->
-    <script src="gt.js"></script>
+
     <script>
-        $.ajax('./click.txt', {
+        $.ajax('http://43.138.134.70/api/getClcikData?type=gt3Click', {
             success: e => {
                 window._clickData_ = e;
             }
         })
     </script>
     <script>
-        getGeetest()
+        getGeetest(e => {
+            let data = e[0].data
+            let keys = Object.keys(data)
+            if (keys.includes('gct_path')) {
+                console.log(data)
+                if (keys.includes('pic_type')) {
+                    let pic_type = data['pic_type'];
+
+                }
+            }
+        })
         function _init_(gt, challenge) {
             if (!challenge) {
                 location.href = './gt4.html?gt=' + gt
