@@ -143,6 +143,7 @@ function HttpDefaultByPost(_req, _res, _data) {
 }
 export default class httpServer {
     constructor(port) {
+        console.log('正在启动验证服务')
         server.listen(port)
     }
     /**
