@@ -229,6 +229,7 @@ export default class MysSign extends base {
 
     if (sign.data && sign.data.risk_code === 375) {
       let gt = sign.data.gt, challenge = sign.data.challenge;
+      console.log(sign.data)
       let g = new geetest({ gt: gt, challenge: challenge })
       let ret = await g.check();
       sign = await this.mysApi.getData(api, {
