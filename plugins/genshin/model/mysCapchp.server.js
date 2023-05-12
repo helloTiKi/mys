@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js'
 import fs from 'node:fs'
 
 import axios from 'axios'
-import httpServer from './httpServer'
+import httpServer from './httpServer.js'
 //debugger
 let path = './plugins/genshin/resources/html/geetest'
 let port = 4399;
@@ -92,11 +92,11 @@ var http = new httpServer(port);
             })
             return
         }
-        data = fs.readFileSync(path + '/index.html', { encoding: 'utf-8' })
+        let data = fs.readFileSync(path + '/index.html', { encoding: 'utf-8' })
         res.end(data)
     })
     http.get('/ret', (req, res, _param) => {
-        data = JSON.parse(req.headers.geetest)
+        let data = JSON.parse(req.headers.geetest)
         console.log(data)
         captcha.setValidate(data)
         res.end('OK')
@@ -108,7 +108,7 @@ var http = new httpServer(port);
             message: 'success',
             data: {}
         }
-        data = captcha.getCaptcha(params.sign);
+        let data = captcha.getCaptcha(params.sign);
         if (data == undefined) retdata.code = -1, retdata.message = "该sign值不存在或已超时"
         retdata.data = data || {}
         res.end(JSON.stringify(retdata))
@@ -117,11 +117,11 @@ var http = new httpServer(port);
         res.end('OK')
     })
     http.get('/newCaptcha', (_req, res, params) => {
-        data = captcha.setCaptcha(params.gt, params.challenge)
+        let data = captcha.setCaptcha(params.gt, params.challenge)
         res.end(data)
     })
     http.default('get', (req, res, url) => {
-        data = getHtmlData(url)
+        let data = getHtmlData(url)
         res.setHeader('Last-Modified', 'Mon, 03 Apr 2023 13:37:30 GMT')
         console.log(`发送了${url}文件`)
         res.end(data)

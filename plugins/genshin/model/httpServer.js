@@ -42,8 +42,9 @@ function getContentType(_contentType) {
     return retdata;
 }
 const server = createServer(function (req, res) {
-    console.log("有客户")
+
     if (req.method == 'GET') {
+        console.log("有客户Get请求了=>" + req.url)
         {
             var url = req.url;
             var params = {};
@@ -74,10 +75,11 @@ const server = createServer(function (req, res) {
         let data = new Uint8Array();
         req.on('data', function (d) {
             data += d;
-            console.log('有数据')
+            //console.log('有数据')
         })
         req.on('end', function () {
             //console.log(data + '')
+            console.log("有客户Post请求了=>" + req.url)
             try {
                 let type = getContentType(req.headers['content-type']);
                 switch (type.type) {
@@ -191,6 +193,6 @@ export default class httpServer {
             method.map(str => str.toLowerCase()).forEach(e => {
                 set(e, func)
             })
-        } else set(key, func);
+        } else set(method, func);
     }
 };
