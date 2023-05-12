@@ -6,9 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>popup</title>
-    <script src="./myJavaScript.js"></script>
+    <script src="../myJavaScript.js"></script>
+    <script src="../jquery.js"></script>
     <script>
-        getGeetest()    
+        getGeetest(e => {
+            let data = e[0].data;
+            let keys = Object.keys(data);
+            if (keys.includes('gct_path')) {
+                console.log(data)
+            }
+        })    
     </script>
     <!--  <script src="./proxy.js"></script> -->
     <style>
@@ -88,17 +95,7 @@
 
         <div id="btn" class="btn">提交</div>
     </form>
-    <!-- 注意，验证码本身是不需要 jquery 库，此处使用 jquery 仅为了在 demo 中使用，减少代码量  -->
-    <script src="./jquery.js"></script>
-    <!-- 引入 gt4.js，既可以使用其中提供的 initGeetest4 初始化函数 -->
     <script src="./gt4.js"></script>
-    <script>
-        $.ajax('./nine.txt', {
-            success: e => {
-                window._clickData_ = e;
-            }
-        })
-    </script>
     <script>
         let gt = getParams('gt') || '54088bb07d2df3c46b79f80300b0abbe'
         initGeetest4({

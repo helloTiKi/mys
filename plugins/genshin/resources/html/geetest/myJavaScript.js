@@ -23,8 +23,7 @@ async function _nine(arr) {
     }
 }
 function getWord(config) {
-    if (!window._clickData_) getClickData(false)
-    var click = _ini_.parse(_clickData_)
+    
 
 }
 async function _word(arr) {
@@ -55,21 +54,22 @@ async function sleep(ms) {
         }, ms);
     })
 }
-function loggingDecorator(func) {
-    return function () {
-        console.log(`Calling function: ${func.name}`);
-        const result = func.apply(this, arguments);
-        console.log(arguments)
-        switch (arguments[0].data.captcha_type) {
-            case 'word':
-                getWord(arguments[0])
-                break;
+
+/**
+ * 
+ * @param {Function} func 
+ */
+async function getGeetest(func) {
+    function loggingDecorator(_func) {
+        return function () {
+            //console.log(_func.caller);
+            const result = _func.apply(this, arguments);
+            //console.log(arguments)
+            func(arguments)
+            //console.log(`Function return value: ${result}`);
+            return result;
         }
-        //console.log(`Function return value: ${result}`);
-        return result;
     }
-}
-async function getGeetest() {
     let keys = {};
     while (true) {
         Object.keys(window).forEach(e => {
@@ -119,7 +119,7 @@ window.gt4handle = function (e) {
         }
         ))
 }
-window.gt3handle = (e) => {
+window.gt3handle = function (e) {
     $('#wait').hide(),
         u = e,
         e.onReady((() => {
@@ -129,18 +129,22 @@ window.gt3handle = (e) => {
                     if (!result) {
                         return alert('请完成验证');
                     };
-                    result.sign = sign;
-                    $.ajax('/ret', {
-                        headers: {
-                            Geetest: JSON.stringify(result)
-                        },
-                        success: function (e) {
-                            console.log(e)
-                        }
-                    })
-                    result.isOK = 1;
-                    console.info(JSON.stringify(result))
-                    alert('验证成功')
+                    try {
+                        result.sign = getParams('sign');
+                        $.ajax('/ret', {
+                            headers: {
+                                Geetest: JSON.stringify(result)
+                            },
+                            success: function (e) {
+                                console.log(e)
+                            }
+                        })
+                        result.isOK = 1;
+                        console.info(JSON.stringify(result))
+                        alert('验证成功')
+                    } catch (error) {
+
+                    }
                 }
                 ))
         }
