@@ -1,7 +1,6 @@
 import YAML from 'yaml'
 import CryptoJS from 'crypto-js'
 import fs from 'node:fs'
-
 import axios from 'axios'
 import httpServer from './httpServer.js'
 //debugger
@@ -80,6 +79,7 @@ Captcha.prototype = {
         }, 30000);
     }
 }
+var captcha = new Captcha();
 var http = new httpServer(port);
 //接口设置区
 {//http.get('/getCaptcha', (req, res, params) => {})
@@ -147,10 +147,7 @@ new Promise(async () => {
         console.info(JSON.stringify(data))
     }
 })
-if (!global.mysCaptchaData) {
-    var captcha = new Captcha();
-    global.mysCaptchaData = captcha;
-}
+
 export default class mysCaptchaServer {
     constructor() {
         this.captcha = global.mysCaptchaData;

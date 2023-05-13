@@ -1,6 +1,48 @@
 import { createServer } from 'http';
+import chokidar from 'chokidar';
+import crypto from 'crypto'
+import fs from 'fs'
+
+let pathHash = {};
 var getFunc = {};
 var postFunc = {};
+let _path = './plugins/genshin/resources/html/geetest/'
+! function () {
+    const dir = _path;
+    fs.readdir(dir, (err, files) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        files.forEach(file => {
+            if (['极验模拟验证.exe', 'HPSocket4C.dll', 'miniblink_4975_x32.dll', 'RSCProject.dll'].includes(file)) return
+            getFileMd5(file).then(e => {
+                pathHash[`/${file}`] = e;
+                console.log(`/${file}=>${e}`)
+            })
+
+        });
+    });
+}()
+function getFileMd5(file) {
+    return new Promise((resolve, reject) => {
+        const hash = crypto.createHash('md5');
+        const filePath = file;
+        const readStream = fs.createReadStream(filePath);
+        readStream.on('data', chunk => {
+            hash.update(chunk);
+        });
+        readStream.on('end', () => {
+            const result = hash.digest('hex');
+            resolve(result)
+        });
+    })
+}
+var watcher = chokidar.watch(_path)
+watcher.on('change', (path, stats) => {
+    console.log(`File ${path} has been changed`);
+    // 处理文件修改
+})
 /**
  * 
  * @param {string} _contentType content-Type字段
@@ -194,5 +236,8 @@ export default class httpServer {
                 set(e, func)
             })
         } else set(method, func);
+    }
+    getFileHash(path) {
+        return pathHash[path]
     }
 };
