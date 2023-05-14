@@ -1,4 +1,5 @@
 import YAML from 'yaml'
+//import _http from 'http'
 import CryptoJS from 'crypto-js'
 import fs from 'node:fs'
 import axios from 'axios'
@@ -79,11 +80,22 @@ Captcha.prototype = {
         }, 30000);
     }
 }
+
 var captcha = new Captcha();
 var http = new httpServer(port);
+var tool = {
+    /**
+     * @param {string} key 请求路径
+     * @returns {boolean} 返回是否可以更新缓存
+     */
+    isCache: function (key, Etag) {
+        let md5 = http.getFileHash(key);
+        return (md5 == Etag)
+    }
+}
 //接口设置区
 {//http.get('/getCaptcha', (req, res, params) => {})
-    http.get(['/', '/index.html'], (_req, res, params) => {
+    http.get(['/', '/index.html'], (req, res, params) => {
         if (!params.sign) {
             captcha.newCaptcha().then(e => {
                 res.statusCode = 302;
@@ -92,8 +104,21 @@ var http = new httpServer(port);
             })
             return
         }
-        let data = fs.readFileSync(path + '/index.html', { encoding: 'utf-8' })
-        res.end(data)
+        let reqMd5 = req.headers['if-none-match'];
+        if (tool.isCache('/index.html', reqMd5)) {
+            res.writeHead(304, {
+                ETag: reqMd5
+            })
+            res.end()
+        } else {
+            let data = fs.readFileSync(path + '/index.html', { encoding: 'utf-8' })
+            res.writeHead(200, 'OK', {
+                ETag: http.getFileHash('/index.html')
+            })
+            res.end(data)
+            console.log('发送了index.html文件')
+        }
+
     })
     http.get('/ret', (req, res, _param) => {
         let data = JSON.parse(req.headers.geetest)
@@ -102,7 +127,7 @@ var http = new httpServer(port);
         res.end('OK')
     })
     http.get('/getCaptcha', (_req, res, params) => {
-        res.setHeader('content-type', 'application/json; charset=utf-8')
+        res.setHeader('Content-Type', 'application/json; charset=utf-8')
         let retdata = {
             code: 0,
             message: 'success',
@@ -121,10 +146,20 @@ var http = new httpServer(port);
         res.end(data)
     })
     http.default('get', (req, res, url) => {
-        let data = getHtmlData(url)
-        res.setHeader('Last-Modified', 'Mon, 03 Apr 2023 13:37:30 GMT')
-        console.log(`发送了${url}文件`)
-        res.end(data)
+        let reqMd5 = req.headers['if-none-match'];
+        if (tool.isCache(url, reqMd5)) {
+            res.writeHead(304, {
+                ETag: reqMd5
+            })
+            res.end()
+        } else {
+            let data = fs.readFileSync(path + url, { encoding: 'utf-8' })
+            res.writeHead(200, 'OK', {
+                ETag: http.getFileHash(url)
+            })
+            res.end(data)
+            console.log(`发送了${url}文件`)
+        }
     })
 }
 new Promise(async () => {

@@ -1,7 +1,8 @@
-import { createServer } from 'http';
+import http from 'http';
 import chokidar from 'chokidar';
 import crypto from 'crypto'
 import fs from 'fs'
+import path from 'path';
 
 let pathHash = {};
 var getFunc = {};
@@ -9,33 +10,61 @@ var postFunc = {};
 let _path = './plugins/genshin/resources/html/geetest/'
 ! function () {
     const dir = _path;
-    fs.readdir(dir, (err, files) => {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        files.forEach(file => {
-            if (['极验模拟验证.exe', 'HPSocket4C.dll', 'miniblink_4975_x32.dll', 'RSCProject.dll'].includes(file)) return
-            getFileMd5(file).then(e => {
-                pathHash[`/${file}`] = e;
-                console.log(`/${file}=>${e}`)
-            })
+    function readDirRecursively(dir) {
+        fs.readdir(dir, (err, files) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            // 遍历目录中的所有文件和文件夹
+            files.forEach((filename) => {
+                const file = filename;
+                const filepath = path.join(dir, filename);
+                // 判断文件或文件夹类型
+                fs.stat(filepath, (err, stats) => {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                    if (stats.isFile()) {
+                        if (['极验模拟验证.exe', 'HPSocket4C.dll',
+                            'miniblink_4975_x32.dll', 'RSCProject.dll',
+                            '.gitignore', 'cookies.dat', 'temp'].includes(file)) return
+                        getFileMd5(filepath).then(e => {
+                            let indexPath = "/" + path.relative(_path, filepath).replace(/\\/g, '/')
 
+                            pathHash[indexPath] = e;
+                            console.log(`${indexPath}=>${e}`)
+                        }).catch(e => {
+                            debugger
+                        })
+                        //console.log(`${filepath} 是一个文件`);
+                    } else if (stats.isDirectory()) {
+                        readDirRecursively(filepath);
+                    }
+                });
+            });
         });
-    });
+    }
+    readDirRecursively(dir)
 }()
 function getFileMd5(file) {
     return new Promise((resolve, reject) => {
         const hash = crypto.createHash('md5');
         const filePath = file;
-        const readStream = fs.createReadStream(filePath);
-        readStream.on('data', chunk => {
-            hash.update(chunk);
-        });
-        readStream.on('end', () => {
-            const result = hash.digest('hex');
-            resolve(result)
-        });
+        try {
+            var readStream = fs.createReadStream(filePath);
+            readStream.on('data', chunk => {
+                hash.update(chunk);
+            });
+            readStream.on('end', () => {
+                const result = hash.digest('hex');
+                readStream.close()
+                resolve(result)
+            });
+        } catch (error) {
+            reject(error)
+        }
     })
 }
 var watcher = chokidar.watch(_path)
@@ -83,7 +112,7 @@ function getContentType(_contentType) {
     })
     return retdata;
 }
-const server = createServer(function (req, res) {
+const server = http.createServer(function (req, res) {
 
     if (req.method == 'GET') {
         console.log("有客户Get请求了=>" + req.url)
