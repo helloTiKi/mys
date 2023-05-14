@@ -23,10 +23,10 @@ async function _nine(arr) {
     }
 }
 function getWord(config) {
-    
+
 
 }
-async function _word(arr) {
+async function _wordBygt3(arr) {
     let dom = $('.geetest_bg');
     if (dom.length !== 1) return;
     let { top, left } = dom.offset()
