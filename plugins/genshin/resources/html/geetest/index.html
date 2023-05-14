@@ -108,10 +108,13 @@
             if (keys.includes('gct_path')) {
                 console.log(data)
                 if (keys.includes('pic_type')) {
+                    //click
                     let pic_type = data['pic_type'];
-
+                    let pic_url = `https://static.geetest.com${data.pic}?challenge=${window.GeeChallenge}`;
+                    console.log(pic_url)
                 }
             }
+            
         })
         function _init_(gt, challenge) {
             if (!challenge) {
