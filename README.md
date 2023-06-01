@@ -1,4 +1,4 @@
-# Miao-Yunzai v3
+# Mys-Yunzai v3
 
 基于乐神版[云崽v3.0](https://gitee.com/le-niao/Yunzai-Bot) 改造
 ---
