@@ -81,6 +81,10 @@ export default class MysSign extends base {
       case 'luna':
         api.info = 'luna_sign_info', api.home = 'luna_sign_home', api.sign = 'luna_sign';
         let UserGameRoles = await this.mysApi.getUserGameRoles('hkrpg_cn');
+        if (!UserGameRoles) return {
+          retcode: 100,
+          msg: '[星穹铁道]签到失败：未查询到角色'
+        }
         this.mysApi.uid = UserGameRoles.game_uid, this.mysApi.server = UserGameRoles.region || 'prod_gf_cn';
         ck.uid = UserGameRoles.game_uid
         break;

@@ -5,10 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>极验验证</title>
-    <script src="./myJavaScript.js"></script>
+    <script src="myJavaScript.js" type="text/javascript"></script>
     <script src="jquery.js"></script>
     <script src="gt.js"></script>
-    <link rel="stylesheet" href="imdex.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+    <script></script>
 </head>
 
 <body>
@@ -42,28 +44,130 @@
         <br>
         <div id="btn" class="btn" onclick="check()">开始验证</div>
     </form>
-
+    <div id="overlay">
+        <div id="modal">
+            <div class="modal-content">
+                <h2>提示</h2>
+                <p class="message">这是一个模态框弹出框。</p>
+                <button id="okButton">确定</button>
+                <button id="cancelButton">取消</button>
+            </div>
+        </div>
+    </div>
     <script>
-        $.ajax('http://43.138.134.70/api/getClcikData?type=gt3Click', {
-            success: e => {
-                window._clickData_ = e;
+        !function () {
+            const modal = document.querySelector('#overlay');
+            const okButton = document.querySelector('#okButton');
+            const cancelButton = document.querySelector('#cancelButton');
+            window.showDialog = (message) => {
+                $('.message')[0].innerText = message;
+                modal.style.display = 'block';
             }
-        })
+            window.hideDialog = () => {
+                modal.style.display = 'none';
+            }
+            okButton.addEventListener('click', hideDialog);
+            cancelButton.addEventListener('click', hideDialog);
+        }()
+        var _geetestData = {
+            pic_type: "",
+            pic_md5: "",
+            pic_url: "",
+            naturalWidth: 0,
+            naturalHeight: 0,
+            clickArray: [],
+            captchaArray: [],
+            type: '',
+            new: true
+        };
     </script>
     <script>
-        getGeetest(e => {
+        let geetest_key = 'gct_path'
+        getGeetest(async e => {
             let data = e[0].data
             let keys = Object.keys(data)
-            if (keys.includes('gct_path')) {
+            //geetest_big_item
+            if (keys.includes(geetest_key)) {
+                setTimeout(() => {
+                    _geetestData.clickArray = [];
+                    let geetest = document.querySelector('.geetest_commit');
+                    geetest.addEventListener('click', (event) => {
+                        console.log(_geetestData.clickArray)
+                    })
+                    document.querySelector('.geetest_big_item').addEventListener('click', function item(event) {
+                        let { top, left } = $('.geetest_item_wrap').offset()
+                        _geetestData.clickArray.push([Math.round(event.clientX - left), Math.round(event.clientY - top)])
+                        setTimeout(() => {
+                            let arr = document.querySelectorAll('.geetest_mark_show');
+                            for (const dom of arr) {
+                                if (!dom.isok) {
+                                    dom.addEventListener('click', function mark_show(event) {
+                                        let num = parseInt(this.firstChild.textContent) - 1
+                                        for (; num < _geetestData.clickArray.length;) {
+                                            _geetestData.clickArray.pop()
+                                        }
+                                    })
+                                    dom.isok = true
+                                }
+                            }
+                        }, 100);
+                    })
+                }, 200);
                 console.log(data)
                 if (keys.includes('pic_type')) {
+                    geetest_key = 'pic_type';
                     //click
                     let pic_type = data['pic_type'];
-                    let pic_url = `https://static.geetest.com${data.pic}?challenge=${window.GeeChallenge}`;
-                    console.log(pic_url)
-                }
-            }
+                    _geetestData.pic_type = pic_type;
+                    _geetestData.pic_url = `https://static.geetest.com${data.pic}?challenge=${window.GeeChallenge}`;
+                    console.log(_geetestData.pic_url)
+                    var picdata = await tools.getPicData(_geetestData.pic_url);
+                    console.log(picdata)
+                    _geetestData.pic_md5 = tools.calculateMD5(new Uint8Array(picdata))
+                    console.log(_geetestData.pic_md5)
+                    const img = new Image();
+                    img.src = _geetestData.pic_url;
+                    img.onload = function () {
+                        _geetestData.naturalWidth = img.naturalWidth, _geetestData.naturalHeight = img.naturalHeight;
+                        console.log('原始宽度：', img.naturalWidth);
+                        console.log('原始高度：', img.naturalHeight);
+                    };
 
+                    var captchaData = await tools.getDataByPicMd5('gt3', 'click', _geetestData.pic_md5)
+                    switch (captchaData.code) {
+                        case 0:
+                            //查询成功，执行模拟操作流程
+                            break;
+                        case -4:
+                            let data = await tools.getDataByPicUrl(_geetestData.pic_url);
+                            if (data.code == 10000) {
+                                let clickdata = data.data.data;
+
+                                clickdata = function (data) {
+                                    let retdata = [];
+                                    let width = Math.floor($('.geetest_item_img').width()), height = Math.floor($('.geetest_item_img').height())
+                                    clickdata.split('|').forEach(e => {
+                                        let _d = e.split(',').map(e => {
+                                            return parseInt(e)
+                                        });
+                                        _geetestData.captchaArray.push([_d[0], _d[1]])
+                                        _d[0] = Math.floor(_d[0] * (width / _geetestData.naturalWidth)),
+                                            _d[1] = Math.floor(_d[1] * (height / _geetestData.naturalHeight))
+                                        retdata.push([_d[0], _d[1]])
+                                    });
+                                    return retdata
+                                }(clickdata)
+
+                                captcha.wordGt3(clickdata)
+                            }
+                            break
+
+                    }
+                }
+            } else if (keys.includes('result') && keys.length == 1) {
+                _geetestData.type = data['result'];
+                console.log('验证模式：' + _geetestData.type)
+            }
         })
         function _init_(gt, challenge) {
             if (!challenge) {
@@ -81,7 +185,43 @@
                 width: "300px",
                 https: true
                 // 更多前端配置参数说明请参见：http://docs.geetest.com/install/client/web-front/
-            }, gt3handle)
+            }, function (e) {
+                $('#wait').hide(),
+                    u = e,
+                    e.onReady((() => {
+                        e.verify(),
+                            e.onSuccess((() => {
+                                var result = e.getValidate();
+                                if (!result) {
+                                    return alert('请完成验证');
+                                };
+                                try {
+                                    result.sign = getParams('sign');
+                                    $.ajax('/ret', {
+                                        headers: {
+                                            Geetest: JSON.stringify(result)
+                                        },
+                                        success: function (e) {
+                                            console.log(e)
+                                        }
+                                    })
+                                    debugger
+                                    window.tools.newClickData('gt3', 'click', window._geetestData.pic_md5, _geetestData.new ? _geetestData.captchaArray.join('|') : _geetestData.clickArray.join('|'), window._geetestData.pic_type)
+                                    result.isOK = 1;
+                                    console.info(JSON.stringify(result))
+                                    showDialog('验证成功')
+                                    //alert('验证成功')
+                                } catch (error) {
+
+                                }
+                            }
+                            ))
+                    }
+                    )),
+                    e.onError((t => {
+                    }
+                    ))
+            })
         }
     </script>
 </body>

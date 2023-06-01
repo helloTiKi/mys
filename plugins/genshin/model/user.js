@@ -38,6 +38,7 @@ export default class User extends base {
     }
 
     let ck = this.e.ck.replace(/#|'|"/g, '')
+    ck = this.e.ck.replace(/#绑定ck |cookie /g, '')
     let param = {}
     ck.split(';').forEach((v) => {
       // 处理分割特殊cookie_token

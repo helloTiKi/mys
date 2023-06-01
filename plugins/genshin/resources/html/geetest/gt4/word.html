@@ -7,62 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>popup</title>
     <script src="../myJavaScript.js"></script>
-    <script>
-        getGeetest()    
-    </script>
-    <!--  <script src="./proxy.js"></script> -->
-    <style>
-        body {
-            margin: 50px 0;
-            text-align: center;
-            font-family: "PingFangSC-Regular", "Open Sans", Arial, "Hiragino Sans GB", "Microsoft YaHei", "STHeiti", "WenQuanYi Micro Hei", SimSun, sans-serif;
-        }
-
-        .inp {
-            border: 1px solid #cccccc;
-            border-radius: 2px;
-            padding: 0 10px;
-            width: 239px;
-            height: 40px;
-            font-size: 18px;
-        }
-
-        .btn {
-            display: inline-block;
-            box-sizing: border-box;
-            border: 1px solid #cccccc;
-            border-radius: 2px;
-            width: 100px;
-            height: 40px;
-            line-height: 40px;
-            font-size: 16px;
-            color: #666;
-            cursor: pointer;
-            background: white linear-gradient(180deg, #ffffff 0%, #f3f3f3 100%);
-        }
-
-        .btn:hover {
-            background: white linear-gradient(0deg, #ffffff 0%, #f3f3f3 100%)
-        }
-
-        #captcha {
-            display: inline-block;
-        }
-
-        label {
-            vertical-align: top;
-            display: inline-block;
-            width: 80px;
-            text-align: right;
-        }
-
-        #wait {
-            text-align: left;
-            color: #666;
-            margin: 0;
-        }
-    </style>
-
+    <script src="../jquery.js"></script>
+    <script src="./gt4.js"></script>
+    <link rel="stylesheet" href="gt4.css">
 </head>
 
 <body>
@@ -88,24 +35,75 @@
 
         <div id="btn" class="btn">提交</div>
     </form>
-    <!-- 注意，验证码本身是不需要 jquery 库，此处使用 jquery 仅为了在 demo 中使用，减少代码量  -->
-    <script src="../jquery.js"></script>
-    <script src="../ini.js"></script>
     <script>
-        var _clickData_ = '';
-        getClickData()
+        var _geetestData = {
+            pic_type: "",
+            pic_md5: "",
+            pic_url: "",
+            naturalWidth: 0,
+            naturalHeight: 0,
+            clickArray: [],
+            captchaArray: [],
+            type: '',
+            new: true
+        };
+
+        getGeetest(async e => {
+            console.log(e[0])
+            let data = e[0].data
+            let keys = Object.keys(data)
+            if (keys.includes('gct_path')) {
+                //初始化加载
+
+                
+            } else if (keys.includes('seccode')) {
+                //提交验证
+
+            }
+        })
     </script>
-    <!-- 引入 gt4.js，既可以使用其中提供的 initGeetest4 初始化函数 -->
-    <script src="./gt4.js"></script>
     <script>
-        let gt = getParams('gt') || '54088bb07d2df3c46b79f80300b0abbe'
+        let gt = getParams('gt') || 'fa08f72997a01b95bde5facadcf284c4'
         initGeetest4({
             captchaId: gt,
             product: 'bind',
             language: "zho",
             riskType: 'word',
             https: true
-        }, gt4handle);
+        }, function (e) {
+            $('#wait').hide(),
+                e.onReady((() => {
+                    e.showCaptcha(),
+                        e.onSuccess((() => {
+                            var result = e.getValidate();
+                            if (!result) {
+                                return alert('请完成验证');
+                            };
+                            console.log(result)
+                            try {
+                                result.sign = sign;
+                                $.ajax('/ret', {
+                                    headers: {
+                                        Geetest: JSON.stringify(result)
+                                    },
+                                    success: function (e) {
+                                        console.log(e)
+                                    }
+                                })
+                                result.isOK = 1;
+                                console.info(JSON.stringify(result))
+                                alert('验证成功')
+                            } catch (error) {
+
+                            }
+                        }
+                        ))
+                }
+                )),
+                e.onError((t => {
+                }
+                ))
+        });
     </script>
 </body>
 

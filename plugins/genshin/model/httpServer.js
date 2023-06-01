@@ -67,11 +67,29 @@ function getFileMd5(file) {
         }
     })
 }
+const md5sum = (data) => {
+    return crypto.createHash('md5').update(data).digest('hex');
+};
 var watcher = chokidar.watch(_path)
-watcher.on('change', (path, stats) => {
-    console.log(`File ${path} has been changed`);
-    // 处理文件修改
-})
+watcher.on('change', async (filePath, stats) => {
+    async function sleep(ms) {
+        return new Promise((resolve, reject) => {
+            setTimeout(resolve, ms)
+        })
+    }
+    await sleep(500)
+    let file = "/" + path.relative(_path, filePath).replace(/\\/g, '/');
+    const newData = fs.readFileSync(filePath);
+    const newMd5 = md5sum(newData);
+    if (pathHash[file]) {
+        if (newMd5 !== pathHash[file]) {
+            console.log(`文件 ${file} 发生了改变 文件大小：${stats.size}|${newData.length} md5:${newMd5}`);
+            pathHash[file] = newMd5;
+        }
+    } else {
+        pathHash[file] = newMd5;
+    }
+});
 /**
  * 
  * @param {string} _contentType content-Type字段

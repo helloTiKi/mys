@@ -7,15 +7,10 @@ import httpServer from './httpServer.js'
 //debugger
 let path = './plugins/genshin/resources/html/geetest'
 let port = 4399;
-let isPublicnetwork = false;
 let IPaddress = '127.0.0.1';
 var getHtmlData = typeof getHtmlData == 'function' ? getHtmlData : function e(_s) {
-    let data = {};
     function get(key) {
-        if (!data[key]) {
-            data[key] = fs.readFileSync(path + key, { encoding: 'utf-8' })
-        }
-        return data[key]
+        return fs.readFileSync(path + key, { encoding: 'utf-8' })
     }
     return get
 }()
@@ -28,6 +23,12 @@ function Captcha() {
     }, 30000);
 }
 Captcha.prototype = {
+    /**
+     * 
+     * @param {string} gt gt
+     * @param {string|undefined} cg chanllge
+     * @returns 
+     */
     setCaptcha: function (gt, cg) {
         let key = CryptoJS.MD5(gt + cg).toString();
         this.CaptchaData[key] = {
@@ -81,7 +82,7 @@ Captcha.prototype = {
     }
 }
 
-var captcha = new Captcha();
+var _captcha = new Captcha();
 var http = new httpServer(port);
 var tool = {
     /**
@@ -123,7 +124,7 @@ var tool = {
     http.get('/ret', (req, res, _param) => {
         let data = JSON.parse(req.headers.geetest)
         console.log(data)
-        captcha.setValidate(data)
+        _captcha.setValidate(data)
         res.end('OK')
     })
     http.get('/getCaptcha', (_req, res, params) => {
@@ -133,7 +134,7 @@ var tool = {
             message: 'success',
             data: {}
         }
-        let data = captcha.getCaptcha(params.sign);
+        let data = _captcha.getCaptcha(params.sign);
         if (data == undefined) retdata.code = -1, retdata.message = "该sign值不存在或已超时"
         retdata.data = data || {}
         res.end(JSON.stringify(retdata))
@@ -142,7 +143,7 @@ var tool = {
         res.end('OK')
     })
     http.get('/newCaptcha', (_req, res, params) => {
-        let data = captcha.setCaptcha(params.gt, params.challenge)
+        let data = _captcha.setCaptcha(params.gt, params.challenge)
         res.end(data)
     })
     http.default('get', (req, res, url) => {
@@ -169,11 +170,9 @@ new Promise(async () => {
         IPaddress = data.ip;
         axios.get(`http://${data.ip}:${port}/Publicnetwork`, { timeout: 5000 })
             .then(e => {
-                isPublicnetwork = true;
                 console.log(`当前ip:${IPaddress} 为可访问到本机的公网IP`)
             })
             .catch(e => {
-                isPublicnetwork = false;
                 console.log(`当前ip:${IPaddress} 为无法访问到本机的外网IP\n设置为本地ip:127.0.0.1`)
                 IPaddress = '127.0.0.1'
             })
@@ -185,7 +184,7 @@ new Promise(async () => {
 
 export default class mysCaptchaServer {
     constructor() {
-        this.captcha = global.mysCaptchaData;
+        this.captcha = _captcha;
         this.host = IPaddress + ":" + port;
     }
     getCaptchaHtmlUrl(gt, challenge) {
