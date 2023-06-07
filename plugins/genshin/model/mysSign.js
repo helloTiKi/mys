@@ -231,7 +231,7 @@ export default class MysSign extends base {
       return true
     }
 
-    if (sign.data && sign.data.risk_code === 375) {
+    if (sign.data && (sign.data.risk_code === 375) || (sign.api == 'luna_sign' && sign.data.risk_code === 5001)) {
       let gt = sign.data.gt, challenge = sign.data.challenge;
       console.log(sign.data)
       let g = new geetest({ gt: gt, challenge: challenge })

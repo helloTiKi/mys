@@ -98,9 +98,9 @@ var tool = {
 {//http.get('/getCaptcha', (req, res, params) => {})
     http.get(['/', '/index.html'], (req, res, params) => {
         if (!params.sign) {
-            captcha.newCaptcha().then(e => {
+            _captcha.newCaptcha().then(e => {
                 res.statusCode = 302;
-                res.setHeader("Location", '/index.html?sign=' + e)
+                res.setHeader("Location", 'index.html?sign=' + e)
                 res.end()
             })
             return

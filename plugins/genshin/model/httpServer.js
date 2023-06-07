@@ -184,7 +184,7 @@ const server = http.createServer(function (req, res) {
                 postFunc[req.url](req, res, data)
             } catch (error) {
                 try {
-                    postFunc['default'](req, res, data)
+                    postFunc['default'] && postFunc['default'](req, res, data)
                 } catch (error) {
                     console.error(error)
                     res.writeHead(404)
