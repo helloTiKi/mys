@@ -40,6 +40,7 @@ let _path = './plugins/genshin/resources/html/geetest/'
                         })
                         //console.log(`${filepath} 是一个文件`);
                     } else if (stats.isDirectory()) {
+                        if (filepath.indexOf("\\temp") != -1) return
                         readDirRecursively(filepath);
                     }
                 });

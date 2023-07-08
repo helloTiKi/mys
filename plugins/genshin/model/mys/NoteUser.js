@@ -40,7 +40,7 @@ export default class NoteUser extends BaseModel {
    * @param qq NoterUser对应id（qq）
    * * 若传入e对象则会识别e.user_id，并将user对象添加至e.user
    * @param data 用户对应MysCookie数据，为空则自动读取
-   * @returns {Promise<NoteUser|*>}
+   * @returns {Promise<NoteUser>}
    */
   static async create (qq, data = null) {
     // 兼容处理传入e

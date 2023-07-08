@@ -27,7 +27,8 @@
     "express": "^4.18.2",
     "express-art-template": "^1.0.1",
     "https-proxy-agent": "^6.1.0",
-    "icqq": "^0.2.0",
+    "icqq": "^0.4.7",
+    "image-type": "^5.2.0",
     "ini": "^4.1.0",
     "inquirer": "^9.2.2",
     "lodash": "^4.17.21",
@@ -39,6 +40,7 @@
     "node-xlsx": "^0.4.0",
     "puppeteer": "^20.1.1",
     "redis": "^4.6.6",
+    "ws": "^8.13.0",
     "yaml": "^2.2.2"
   }
 }

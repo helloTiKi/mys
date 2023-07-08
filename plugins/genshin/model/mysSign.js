@@ -244,7 +244,7 @@ export default class MysSign extends base {
         }
       })
       if (sign.retcode != 0) {
-        debugger
+        
         this.signMsg = '验证码失败'
         //sign.message = '验证码失败'
         this.is_verify = true

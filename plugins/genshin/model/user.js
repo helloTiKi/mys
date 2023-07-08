@@ -52,6 +52,8 @@ export default class User extends base {
     }
 
     this.ck = `ltoken=${param.ltoken};ltuid=${param.ltuid || param.login_uid};cookie_token=${param.cookie_token || param.cookie_token_v2}; account_id=${param.ltuid || param.login_uid};`
+    //新增需要的cookie
+    this.ck += `DEVICEFP=${param.DEVICEFP};`
     let flagV2 = false
     if (param.cookie_token_v2 && (param.account_mid_v2 || param.ltmid_v2)) { //
       // account_mid_v2 为版本必须带的字段，不带的话会一直提示绑定cookie失败 请重新登录
@@ -181,7 +183,16 @@ export default class User extends base {
       o.isMain = false
       return o
     })
-
+    let device_fp = (function (ck) {
+      let ret = {
+        "DEVICEFP":''
+      }
+      ck.split(';').forEach(e => {
+        let key = e.split("=");
+        if (key.length == 2) ret[key[0]] = key[1]
+      })
+      return ret['DEVICEFP']
+    })(this.ck)
     ck[this.uid] = {
       uid: this.uid,
       qq: this.e.user_id,
@@ -189,6 +200,7 @@ export default class User extends base {
       ltuid: this.ltuid,
       login_ticket: this.login_ticket,
       device_id: this.getGuid(),
+      device_fp: device_fp,
       isMain: true
     }
 
@@ -200,6 +212,7 @@ export default class User extends base {
         ck: this.ck,
         ltuid: this.ltuid,
         device_id: this.getGuid(),
+        device_fp: device_fp,
         isMain: false
       }
     })

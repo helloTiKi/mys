@@ -173,7 +173,7 @@ new Promise(async () => {
                 console.log(`当前ip:${IPaddress} 为可访问到本机的公网IP`)
             })
             .catch(e => {
-                console.log(`当前ip:${IPaddress} 为无法访问到本机的外网IP\n设置为本地ip:127.0.0.1`)
+                console.log(`当前ip:${IPaddress} 为无法访问到本机的外网IP 或端口未开放，端口为：${port}\n设置为本地ip:127.0.0.1`)
                 IPaddress = '127.0.0.1'
             })
     } else {

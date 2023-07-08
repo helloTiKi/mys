@@ -2,13 +2,96 @@ import md5 from 'md5'
 import lodash from 'lodash'
 import fetch from 'node-fetch'
 import cfg from '../../../../lib/config/config.js'
+import geetest from '../geetest.js'
+import gsData from './gsData.js'
 
 let HttpsProxyAgent = ''
+let AllDevice_id = {};
+let deviceArray = [
+  ['HUAWEI', 'TAS-AN00'],
+  ['HUAWEI', 'LIO-AN00']
+]
+/**
+ * 
+ * @param {string} tuid 通行证id
+ */
+function new_fpData() {
+  /**
+   * 
+   * @param {number} min 
+   * @param {number} max 
+   * @returns {number}
+   */
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  function S4() {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+  }
+  function getGuid() {
+    return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4())
+  }
+  function getDeviceId() {
+    return (S4() + S4() + S4() + S4())
+  }
+  let index = getRandomInt(0, deviceArray.length - 1)
+  let data = {
+    device_id: getDeviceId(),
+    seed_id: getGuid(),
+    seed_time: "1681057102863",
+    platform: "2",
+    device_fp: (function () { return S4() + S4() + S4() })(),
+    app_name: 'bbs_cn',
+    ext_fields: {
+      "hostname": "ubuntu",
+      "buildTime": "1676369261000",
+      "oaid": "error_1002005",
+      "romCapacity": "256",
+      "serialNumber": "00a43012",
+      "sdkVersion": "25",
+      "vaid": "error_1002005",
+      "ramCapacity": "15998",
+      "osVersion": "7.1.2",
+      "buildType": "user",
+      /**手机品牌 */
+      "manufacturer": deviceArray[index][0],
+      /**分辨率 */
+      "screenSize": "900x1600",
+      "aaid": "error_1002005",
+      "accelerometer": "0.13x9.75x2.0997705",
+      "deviceType": "aosp",
+      "cpuType": "armeabi-v7a",
+      /**手机型号 */
+      "board": deviceArray[index][1],
+      "magnetometer": "-36.46x-0.015000001x-0.005000001",
+      "romRemain": "246",
+      "appMemory": "256",
+      "display": "N2G47O",
+      "buildUser": "build",
+      /**手机品牌 */
+      "brand": deviceArray[index][0],
+      /**手机型号 */
+      "productName": deviceArray[index][1],
+      "ramRemain": "14606",
+      "buildTags": "release-keys",
+      "deviceInfo": "google/android_x86/x86:7.1.2/N2G47O/3636322:user/release-keys",
+      "gyroscope": "0.0x0.0x3.0E-4",
+      "hardware": "android_x86",
+      "devId": "REL",
+      "vendor": "WiFi",
+      /**手机型号 */
+      "model": deviceArray[index][1]
+    }
+  }
 
+  return data
+}
 export default class MysApi {
   /**
    * @param uid 游戏uid
-   * @param cookie 米游社cookie
+   * @param {string} cookie 米游社cookie
    * @param option 其他参数
    * @param option.log 是否显示日志
    */
@@ -16,7 +99,8 @@ export default class MysApi {
     this.uid = uid
     this.cookie = cookie
     this.server = this.getServer()
-
+ /*    this.fpdata = gsData.getdefSet('mys', 'fp')
+    this.device_id = this.getGuid() */
     /** 5分钟缓存 */
     this.cacheCd = 300
 
@@ -25,6 +109,9 @@ export default class MysApi {
       ...option
     }
     this.UserGameRoles = {};
+    this['x-rpc-challenge'] = redis.get(this.cacheKey('x-rpc-challenge'))
+  }
+  async getFp() {
 
   }
   async getUserGameRoles(game_biz = '') {
@@ -53,6 +140,14 @@ export default class MysApi {
     }
     //console.log(data)
     let urlMap = {
+      createVerification: {
+        url: "https://api-takumi-record.mihoyo.com/game_record/app/card/wapi/createVerification",
+        query: "is_high=true"
+      },
+      verifyVerification: {
+        url: "https://api-takumi-record.mihoyo.com/game_record/app/card/wapi/verifyVerification",
+        body: data
+      },
       getUserGameRoles: {
         url: 'https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie',
         query: data.game_biz || ''
@@ -256,7 +351,9 @@ export default class MysApi {
       headers = { ...headers, ...data.headers }
       delete data.headers
     }
-
+    if (this['x-rpc-challenge']) {
+      headers['x-rpc-challenge'] = this['x-rpc-challenge']
+    }
     let param = {
       headers,
       agent: await this.getAgent(),
@@ -296,7 +393,22 @@ export default class MysApi {
     if (res.retcode !== 0 && this.option.log) {
       logger.debug(`[米游社接口][请求参数] ${url} ${JSON.stringify(param)}`)
     }
-
+    /**风控了 需要验证 */
+    if (res.retcode == 1034) {
+      let code = await this.getData('createVerification')
+      if (code.retcode == 0) {
+        while (true) {
+          let geet = new geetest(code.data)
+          let d = await geet.check()
+          let c = await this.getData('verifyVerification', d)
+          if (c.retcode == 0) {
+            await this.cache(c.data.challenge, this.cacheKey('x-rpc-challenge'))
+            this['x-rpc-challenge'] = c.data.challenge
+            return await this.getData(type, data, cached)
+          }
+        }
+      }
+    }
     res.api = type
 
     if (cached) this.cache(res, cacheKey)
@@ -311,7 +423,8 @@ export default class MysApi {
       client_type: 5,
       Origin: 'https://webstatic.mihoyo.com',
       X_Requested_With: 'com.mihoyo.hyperion',
-      Referer: 'https://webstatic.mihoyo.com'
+      Referer: 'https://webstatic.mihoyo.com',
+      "x-rpc-device_fp": this.device_ip
     }
     const os = {
       app_version: '2.9.0',
@@ -319,18 +432,14 @@ export default class MysApi {
       client_type: '2',
       Origin: 'https://webstatic-sea.hoyolab.com',
       X_Requested_With: 'com.mihoyo.hoyolab',
-      Referer: 'https://webstatic-sea.hoyolab.com'
+      Referer: 'https://webstatic-sea.hoyolab.com',
+      "x-rpc-device_fp": this.device_ip
     }
     let client
     if (this.server.startsWith('os')) {
       client = os
     } else {
       client = cn
-    }
-    if (iscdk) {
-      return {
-        'User-Agent': client.User_Agent
-      }
     }
     if (sign) {
       return {
@@ -353,7 +462,8 @@ export default class MysApi {
       'x-rpc-client_type': client.client_type,
       'User-Agent': client.User_Agent,
       Referer: client.Referer,
-      DS: this.getDs(query, body)
+      DS: this.getDs(query, body),
+      "x-rpc-device_fp": this.device_ip
     }
   }
 
@@ -379,13 +489,16 @@ export default class MysApi {
     const DS = md5(`salt=${n}&t=${t}&r=${r}`)
     return `${t},${r},${DS}`
   }
-
+  /**
+   * 
+   * @returns {string}
+   */
   getGuid() {
     function S4() {
       return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
     }
 
-    return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4())
+    return this.device_id || (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4())
   }
 
   cacheKey(type, data) {

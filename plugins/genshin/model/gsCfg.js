@@ -64,7 +64,24 @@ class GsCfg {
 
     return this[type][key]
   }
-
+  /**
+     * 保存配置yaml
+     * @param app 功能
+     * @param name 名称
+     * @param type 默认跑配置-defSet，用户配置-config
+     * @param yaml yaml配置
+     */
+  saveYaml(app, name, type, yaml) {
+    let file = this.getFilePath(app, name, type)
+    let key = `${app}.${name}`
+    try {
+      fs.writeFileSync(file, yaml, 'utf8')
+      return true
+    } catch (error) {
+      logger.errtor(`[${app}][${name}] 格式错误 ${error}`)
+      return false
+    }
+  }
   getFilePath(app, name, type) {
     if (type == 'defSet') return `${this.defSetPath}${app}/${name}.yaml`
     else return `${this.configPath}${app}.${name}.yaml`
