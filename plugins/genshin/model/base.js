@@ -2,7 +2,7 @@ export default class base {
   constructor(e = {}) {
     this.e = e
     this.userId = e?.user_id
-    this.model = 'genshin'
+    this.model = e.model || 'genshin'
     this._path = process.cwd().replace(/\\/g, '/')
   }
 

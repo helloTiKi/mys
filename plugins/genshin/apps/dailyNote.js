@@ -7,7 +7,7 @@ import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 gsCfg.cpCfg('mys', 'set')
 
 export class dailyNote extends plugin {
-  constructor () {
+  constructor() {
     super({
       name: '体力查询',
       dsc: '原神体力、札记查询，米游社签到',
@@ -17,6 +17,10 @@ export class dailyNote extends plugin {
         {
           reg: '^#*(体力|树脂|查询体力)$',
           fnc: 'note'
+        },
+        {
+          reg: '^#*(开拓力|查询开拓力)$',
+          fnc: 'lunaNote'
         },
         {
           reg: '^(#签到|#*米游社(自动)*签到|#星铁签到)(force)*$',
@@ -45,27 +49,31 @@ export class dailyNote extends plugin {
   }
 
   /** #体力 */
-  async note () {
+  async note(type = 'genshin') {
+    this.e.model = type
     let data = await Note.get(this.e)
     if (!data) return
 
     /** 生成图片 */
-    let img = await puppeteer.screenshot('dailyNote', data)
+    let img = await puppeteer.screenshot(type, data)
     if (img) await this.reply(img)
   }
-
+  /** #开拓力 */
+  async lunaNote() {
+    this.note('lunaDailyNote')
+  }
   /** #签到 */
-  async sign () {
+  async sign() {
     await MysSign.sign(this.e)
   }
 
   /** 签到任务 */
-  async signTask () {
+  async signTask() {
     let mysSign = new MysSign(this.e)
     await mysSign.signTask(!!this?.e?.msg)
   }
 
-  async signClose () {
+  async signClose() {
     let mysSign = new MysSign(this.e)
     await mysSign.signClose()
   }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link rel="shortcut icon" href="#" />
+    <link rel="stylesheet" type="text/css" href="{{pluResPath}}/html/dailyNote/lunaDailyNote.css" />
+    <link rel="preload" href="{{resPath}}font/tttgbnumber.ttf" as="font">
+</head>
+
+<body>
+    <div class="layout">
+        <div class="inner">
+            <div class="stamina">
+                <span class="name">开拓力</span>
+                <span class="value">{{current_stamina}}/180</span>
+            </div>
+            <div class="stamina-stat">
+                {{ if current_stamina!=180}}
+                <span class="name">剩余恢复时间</span>
+                <span class="value">{{stamina_recover_time}}</span>
+                {{else}} <span class="name">已全部恢复</span>
+                {{/if}}
+            </div>
+            <div class="expedition">
+                <div class="expedition-title">
+                    委托执行（<span class="num">{{expeditions.length}}</span>/4）
+                </div>
+                {{each list val}}
+                <div class="expedition-item">
+                    <div class="name">{{val.name}}</div>
+                    <div class="avatars">
+                        {{ if val.avatars>=1}}
+                        <img class="avatar" src=val.avatars[0] />
+                        {{ else}} <img class="avatar" src="" />
+                        {{/if}}
+                        {{ if val.avatars>=2}}
+                        <img class="avatar" src=val.avatars[1] />
+                        {{else}} <img class="avatar" src="" />
+                        {{/if}}
+                    </div>
+                    <div class="stat">
+                        {{ if val.status=="Ongoing"}}
+                        <div class="residue">剩余</div>
+                        <div class="value">{{val.remaining_time}}</div>
+                        {{else}} <div class="residue">已完成</div>
+                        {{/if}}
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript"></script>
+
+</html>

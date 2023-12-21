@@ -22,6 +22,7 @@ function Captcha() {
         this.clearCaptcha()
     }, 30000);
 }
+
 Captcha.prototype = {
     /**
      * 
@@ -145,6 +146,29 @@ var tool = {
     http.get('/newCaptcha', (_req, res, params) => {
         let data = _captcha.setCaptcha(params.gt, params.challenge)
         res.end(data)
+    })
+    http.get('/getCaptchaHtmlUrl', (_req, res, params) => {
+        let data = _captcha.setCaptcha(params.gt, params.challenge)
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify({
+            url: `http://${this.host}/index.html?sign=` + data,
+            sign: data
+        }))
+    })
+    http.get('/getValidate', (_req, res, params) => {
+        res.setHeader('Content-Type', 'application/json')
+        let ret = this.captcha.getCaptcha(params.sign)
+        if (ret.geetest_validate != undefined) {
+            res.end(JSON.stringify({
+                code: 0,
+                data: ret
+            }))
+        } else if (ret?.Validate.geetest_validate == '') {
+            res.end(JSON.stringify({
+                code: 0,
+                data: null
+            }))
+        }
     })
     http.default('get', (req, res, url) => {
         let reqMd5 = req.headers['if-none-match'];

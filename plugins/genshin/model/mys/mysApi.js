@@ -88,6 +88,18 @@ function new_fpData() {
 
   return data
 }
+class UserData {
+  game_biz = ''
+  region = ''
+  game_uid = ''
+  nickname = ''
+  level = 0
+  is_chosen = false
+  region_name = ''
+  is_official = false
+}
+
+
 export default class MysApi {
   /**
    * @param uid 游戏uid
@@ -99,8 +111,8 @@ export default class MysApi {
     this.uid = uid
     this.cookie = cookie
     this.server = this.getServer()
- /*    this.fpdata = gsData.getdefSet('mys', 'fp')
-    this.device_id = this.getGuid() */
+    /*    this.fpdata = gsData.getdefSet('mys', 'fp')
+       this.device_id = this.getGuid() */
     /** 5分钟缓存 */
     this.cacheCd = 300
 
@@ -109,11 +121,19 @@ export default class MysApi {
       ...option
     }
     this.UserGameRoles = {};
-    this['x-rpc-challenge'] = redis.get(this.cacheKey('x-rpc-challenge'))
+
+  }
+  async init() {
+    this['x-rpc-challenge'] = await redis.get(this.cacheKey('x-rpc-challenge'))
   }
   async getFp() {
 
   }
+  /**
+   * 
+   * @param {string} game_biz 游戏种类
+   * @returns {Promise<UserData|undefined>}
+   */
   async getUserGameRoles(game_biz = '') {
     let th = this;
     function isEmptyObj(obj) {
@@ -123,6 +143,7 @@ export default class MysApi {
       let data = await this.getData('getUserGameRoles');
       if (data.retcode != 0) throw data.message;
       let list = data.data.list;
+      //这里目前有bug 如果存在单个游戏不同服务器就会出现问题 game_biz是否唯一
       list.forEach(obj => {
         th.UserGameRoles[obj.game_biz] = obj;
       })
@@ -172,23 +193,37 @@ export default class MysApi {
         url: `${hostRecord}game_record/app/genshin/api/dailyNote`,
         query: `role_id=${this.uid}&server=${this.server}`
       },
+      /** 开拓力 */
+      lunaDailyNote: {
+        url: `${hostRecord}game_record/app/hkrpg/api/note`,
+        query: `server=prod_gf_cn&role_id=${this.uid}`
+      },
       /** 签到信息 */
       bbs_sign_info: {
-        url: `${host}event/bbs_sign_reward/info`,
-        query: `act_id=e202009291139501&region=${this.server}&uid=${this.uid}`,
-        sign: true
+        url: `${host}event/luna/info`,
+        query: `act_id=e202311201442471&region=${this.server}&uid=${this.uid}`,
+        sign: true,
+        header: {
+          'x-rpc-signgame': 'hk4e'
+        }
       },
       /** 签到奖励 */
       bbs_sign_home: {
-        url: `${host}event/bbs_sign_reward/home`,
-        query: `act_id=e202009291139501&region=${this.server}&uid=${this.uid}`,
-        sign: true
+        url: `${host}event/luna/home`,
+        query: `act_id=e202311201442471&region=${this.server}&uid=${this.uid}`,
+        sign: true,
+        header: {
+          'x-rpc-signgame': 'hk4e'
+        }
       },
       /** 签到 */
       bbs_sign: {
-        url: `${host}event/bbs_sign_reward/sign`,
-        body: { act_id: 'e202009291139501', region: this.server, uid: this.uid },
-        sign: true
+        url: `${host}event/luna/sign`,
+        body: { act_id: 'e202311201442471', region: this.server, uid: this.uid },
+        sign: true,
+        header: {
+          'x-rpc-signgame': 'hk4e'
+        }
       },
       /**星穹列车签到信息 */
       luna_sign_info: {
@@ -288,13 +323,13 @@ export default class MysApi {
 
     if (!urlMap[type]) return false
 
-    let { url, query = '', body = '', sign = '', iscdk = '' } = urlMap[type]
+    let { url, query = '', body = '', sign = '', header } = urlMap[type]
 
     if (query) url += `?${query}`
     if (body) body = JSON.stringify(body)
 
-    let headers = this.getHeaders(query, body, sign, iscdk)
-
+    let headers = this.getHeaders(query, body, sign)
+    headers = { ...header, ...headers }
     return { url, headers, body }
   }
   getCdkQuire(cdk, authKey) {

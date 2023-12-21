@@ -1,0 +1,163 @@
+body {
+    width: 430px;
+    height: 450px;
+}
+
+.layout {
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    background: url(https://webstatic.mihoyo.com/app/community-game-records/rpg/images/daily-bg.3c812249.png);
+    background-size: 100% 100%;
+    width: 94.13333%;
+    height: 90.93333%;
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 4.8vw
+}
+
+.layout .inner {
+    width: 92%;
+    height: 87.73333%;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    margin-left: 0px;
+}
+
+.layout .inner .empty {
+    position: relative;
+    left: -3.2vw;
+    margin-top: 8vw
+}
+.layout .inner .expedition-item {
+    width: 95%;
+    height: 40px;
+    padding-left: 5px;
+    border-radius: 0 2.66667vw 0 0;
+    border: 1px solid hsla(38, 22%, 80%, .5);
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-weight: bold;
+    color: #363028
+}
+
+.layout .inner .expedition-item:nth-child(n+2) {
+    margin-top: 5px
+}
+
+.layout .inner .expedition-item .name {
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 50%;
+}
+
+.layout .inner .expedition-item .stat {
+    width: 70px;
+    padding-left: 20px;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center
+}
+
+.layout .inner .expedition-item .stat div {
+    text-align: center
+}
+
+.layout .inner .expedition-item .stat .residue {
+    height: 10px;
+    top: 0px;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-weight: bold;
+    color: #7f858a;
+    margin-top: -5px;
+}
+
+.layout .inner .expedition-item .stat .value {
+    height: 15px;
+    margin-top: 10px;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-weight: bold;
+    color: #363028;
+}
+
+.layout .inner .expedition-item .avatars {
+    width: 80px;
+    display: flex
+}
+
+.layout .inner .expedition-item .avatars .avatar {
+    width: 36px;
+    height: 38px;
+    border: 1px solid #9e8064;
+    border-radius: 100%;
+}
+
+.layout .inner .expedition-item .avatars .avatar:first-child {
+    margin-right: 5px;
+    left: 40%;
+}
+
+.layout .inner .expedition-title {
+    height: 20px;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-weight: bold;
+    color: #7f858a;
+    display: flex;
+}
+
+.layout .inner .expedition-title .num {
+    color: #9e8064
+}
+
+.layout .inner .stamina-stat {
+    font-weight: 500;
+    color: #db9a45;
+    font-weight: bold;
+    margin-bottom: 12.53333%;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center
+}
+
+.layout .inner .stamina-stat .name {
+    font-size: 3.2%;
+    color: #7f858a;
+    margin-right: 1.86667%
+}
+
+.layout .inner .stamina-stat .value {
+    color: #363028
+}
+
+.layout .inner .stamina {
+    height: 10px;
+    color: #363028;
+    display: flex;
+    font-weight: bold;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-left: 0px;
+    margin-top: 50px
+}
+
+.layout .inner .stamina .name {
+    color: #7f858a;
+    font-size: 3.2%;
+    display: flex;
+    margin-right: 1.86667%
+}

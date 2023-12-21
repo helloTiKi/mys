@@ -34,7 +34,8 @@ export default class MysInfo {
       'compute',
       'avatarSkill',
       'detail',
-      'blueprint']
+      'blueprint',
+      'lunaDailyNote']
   }
 
   static async init(e, api) {
@@ -197,7 +198,16 @@ export default class MysInfo {
     e.uid = mysInfo.uid
 
     let mysApi = new MysApi(mysInfo.uid, mysInfo.ckInfo.ck, option)
-
+    if (['lunaDailyNote'].includes(api)) {
+      let d = await mysApi.getUserGameRoles('hkrpg_cn');
+      if(!d){
+        //B服的game_biz暂时不知道
+        d = await mysApi.getUserGameRoles('hkrpg_cn');
+        if(!d)throw '未查询到角色数据'
+      }
+      mysApi.uid = d.game_uid;
+      mysApi.server = d.region
+    }
     let res
     if (lodash.isObject(api)) {
       let all = []

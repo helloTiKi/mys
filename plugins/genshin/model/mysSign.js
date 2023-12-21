@@ -67,8 +67,6 @@ export default class MysSign extends base {
   async doSign(ck, isLog = true, gamebiz = 'genshin') {
     ck = this.setCk(ck)
     this.mysApi = new MysApi(ck.uid, ck.ck, { log: isLog, device_id: ck.device_id, gamebiz: gamebiz })
-    this.key = `${this.prefix}isSign:${this.mysApi.uid}gamebiz:${gamebiz}`
-    this.log = `[uid:${ck.uid}][qq:${lodash.padEnd(this.e.user_id, 10, ' ')}]`
     let api = {
       info: '',
       sign: '',
@@ -77,10 +75,17 @@ export default class MysSign extends base {
     switch (gamebiz) {
       case 'genshin':
         api.info = 'bbs_sign_info', api.home = 'bbs_sign_home', api.sign = 'bbs_sign';
+        var UserGameRoles = await this.mysApi.getUserGameRoles('hk4e_cn');
+        if (!UserGameRoles) return {
+          retcode: 100,
+          msg: '[星穹铁道]签到失败：未查询到角色'
+        }
+        this.mysApi.uid = UserGameRoles.game_uid, this.mysApi.server = UserGameRoles.region || 'prod_gf_cn';
+        ck.uid = UserGameRoles.game_uid
         break;
       case 'luna':
         api.info = 'luna_sign_info', api.home = 'luna_sign_home', api.sign = 'luna_sign';
-        let UserGameRoles = await this.mysApi.getUserGameRoles('hkrpg_cn');
+        var UserGameRoles = await this.mysApi.getUserGameRoles('hkrpg_cn');
         if (!UserGameRoles) return {
           retcode: 100,
           msg: '[星穹铁道]签到失败：未查询到角色'
@@ -89,6 +94,8 @@ export default class MysSign extends base {
         ck.uid = UserGameRoles.game_uid
         break;
     }
+    this.key = `${this.prefix}isSign:${this.mysApi.uid}gamebiz:${gamebiz}`
+    this.log = `[uid:${ck.uid}][qq:${lodash.padEnd(this.e.user_id, 10, ' ')}]`
     let isSigned = await redis.get(this.key)
     if (isSigned && this.isTask && !this.force) {
       let reward = await this.getReward(isSigned, gamebiz)

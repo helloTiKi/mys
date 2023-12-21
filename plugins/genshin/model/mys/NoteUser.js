@@ -11,7 +11,7 @@ import MysUser from './MysUser.js'
 import gsCfg from '../gsCfg.js'
 
 export default class NoteUser extends BaseModel {
-  constructor (qq, data = null) {
+  constructor(qq, data = null) {
     super()
     // 检查实例缓存
     let cacheObj = this._getThis('user', qq)
@@ -42,7 +42,7 @@ export default class NoteUser extends BaseModel {
    * @param data 用户对应MysCookie数据，为空则自动读取
    * @returns {Promise<NoteUser>}
    */
-  static async create (qq, data = null) {
+  static async create(qq, data = null) {
     // 兼容处理传入e
     if (qq && qq.user_id) {
       let e = qq
@@ -57,7 +57,7 @@ export default class NoteUser extends BaseModel {
     return user
   }
 
-  static async forEach (fn) {
+  static async forEach(fn) {
     // 初始化用户缓存
     let res = await gsCfg.getBingCk()
     for (let qq in res.noteCk) {
@@ -77,7 +77,7 @@ export default class NoteUser extends BaseModel {
    * 获取当前用户uid
    * 如果为绑定用户，优先获取ck对应uid，否则获取绑定uid
    */
-  get uid () {
+  get uid() {
     // 如果绑定有CK，则
     if (this.hasCk) {
       return this.mainCk?.uid
@@ -88,14 +88,14 @@ export default class NoteUser extends BaseModel {
   /**
    * 当前用户是否具备CK
    */
-  get hasCk () {
+  get hasCk() {
     return this.ckData && !lodash.isEmpty(this.ckData)
   }
 
   /**
    * 获取绑定CK的UID列表，如未绑定CK则返回空数组
    */
-  get ckUids () {
+  get ckUids() {
     if (!this.hasCk) {
       return []
     }
@@ -107,7 +107,7 @@ export default class NoteUser extends BaseModel {
    *
    * 返回isMain的uid，没有的话返回首位
    */
-  get mainCk () {
+  get mainCk() {
     if (this.hasCk) {
       return lodash.filter(this.ckData, (ck) => ck.isMain)[0] || lodash.values(this.ckData)[0]
     }
@@ -118,7 +118,7 @@ export default class NoteUser extends BaseModel {
    * 获取当前用户的所有ck
    * @returns { {ltuid:{ckData, ck, uids}} }
    */
-  get cks () {
+  get cks() {
     let cks = {}
     if (!this.hasCk) {
       return cks
@@ -142,8 +142,8 @@ export default class NoteUser extends BaseModel {
    * 主要供内部调用，建议使用 user.uid 获取用户uid
    * @returns {Promise<*>}
    */
-  async getRegUid () {
-    let redisKey = `Yz:genshin:mys:qq-uid:${this.qq}`
+  async getRegUid(game_biz = 'genshin') {
+    let redisKey = `Yz:${game_biz}:mys:qq-uid:${this.qq}`
     let uid = await redis.get(redisKey)
     if (uid) {
       await redis.setEx(redisKey, 3600 * 24 * 30, uid)
@@ -157,7 +157,7 @@ export default class NoteUser extends BaseModel {
    * @param uid 要绑定的uid
    * @param force 若已存在绑定uid关系是否强制更新
    */
-  async setRegUid (uid = '', force = false) {
+  async setRegUid(uid = '', force = false) {
     let redisKey = `Yz:genshin:mys:qq-uid:${this.qq}`
     if (uid && /[1|2|5-9][0-9]{8}/.test(uid)) {
       uid = String(uid)
@@ -176,7 +176,7 @@ export default class NoteUser extends BaseModel {
    * 切换绑定CK生效的UID
    * @param uid 要切换的UID
    */
-  async setMainUid (uid = '') {
+  async setMainUid(uid = '') {
     // 兼容传入index
     if (uid * 1 <= this.ckUids.length) uid = this.ckUids[uid]
     // 非法值，以及未传入时使用当前或首个有效uid
@@ -193,7 +193,7 @@ export default class NoteUser extends BaseModel {
   /**
    * 初始化或重置 当前用户缓存
    */
-  async initCache () {
+  async initCache() {
     // 刷新绑定CK的缓存
     let count = 0
     let cks = this.cks
@@ -214,7 +214,7 @@ export default class NoteUser extends BaseModel {
    * 为当前用户增加CK
    * @param cks 绑定的ck
    */
-  async addCk (cks) {
+  async addCk(cks) {
     let ckData = this.ckData
     lodash.forEach(cks, (ck, uid) => {
       ckData[uid] = ck
@@ -228,7 +228,7 @@ export default class NoteUser extends BaseModel {
    * @param ltuid 根据ltuid删除，未传入则删除当前生效uid对应ltuid
    * @param needRefreshCache 是否需要刷新cache，默认刷新
    */
-  async delCk (ltuid = '', needRefreshCache = true) {
+  async delCk(ltuid = '', needRefreshCache = true) {
     if (!ltuid) {
       ltuid = this.mainCk.ltuid
     }
@@ -258,7 +258,7 @@ export default class NoteUser extends BaseModel {
   /**
    * 检查当前用户绑定的CK状态
    */
-  async checkCk () {
+  async checkCk() {
     // TODO:待完善文案
     let cks = this.cks
     let ret = []
@@ -294,13 +294,13 @@ export default class NoteUser extends BaseModel {
   }
 
   // 内部方法：读取CK数据
-  _getCkData () {
+  _getCkData() {
     this.ckData = gsCfg.getBingCkSingle(this.qq)
     return this.ckData
   }
 
   // 内部方法：写入CK数据
-  _saveCkData () {
+  _saveCkData() {
     gsCfg.saveBingCk(this.qq, this.ckData)
   }
 }
