@@ -2,6 +2,7 @@ import moment from 'moment'
 import lodash from 'lodash'
 import base from './base.js'
 import MysApi from './mys/mysApi.js'
+//import { genshin, StarRail, bh3, user } from 'mysapi'
 import gsCfg from './gsCfg.js'
 import User from './user.js'
 import common from '../../../lib/common/common.js'
@@ -43,7 +44,7 @@ export default class MysSign extends base {
     }
 
     let msg = []
-    gamebiz = gamebiz == 'all' ? ['genshin', 'luna'] : [gamebiz];
+    gamebiz = gamebiz == 'all' ? ['genshin', 'sr'] : [gamebiz];
 
     for (let i in uids) {
       mysSign.ckNum = Number(i) + 1
@@ -78,12 +79,12 @@ export default class MysSign extends base {
         var UserGameRoles = await this.mysApi.getUserGameRoles('hk4e_cn');
         if (!UserGameRoles) return {
           retcode: 100,
-          msg: '[星穹铁道]签到失败：未查询到角色'
+          msg: '[原神]签到失败：未查询到角色'
         }
         this.mysApi.uid = UserGameRoles.game_uid, this.mysApi.server = UserGameRoles.region || 'prod_gf_cn';
         ck.uid = UserGameRoles.game_uid
         break;
-      case 'luna':
+      case 'sr':
         api.info = 'luna_sign_info', api.home = 'luna_sign_home', api.sign = 'luna_sign';
         var UserGameRoles = await this.mysApi.getUserGameRoles('hkrpg_cn');
         if (!UserGameRoles) return {
@@ -251,7 +252,7 @@ export default class MysSign extends base {
         }
       })
       if (sign.retcode != 0) {
-        
+
         this.signMsg = '验证码失败'
         //sign.message = '验证码失败'
         this.is_verify = true

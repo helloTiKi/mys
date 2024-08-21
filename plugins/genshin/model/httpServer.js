@@ -34,7 +34,6 @@ let _path = './plugins/genshin/resources/html/geetest/'
                             let indexPath = "/" + path.relative(_path, filepath).replace(/\\/g, '/')
 
                             pathHash[indexPath] = e;
-                            console.log(`${indexPath}=>${e}`)
                         }).catch(e => {
                             debugger
                         })
