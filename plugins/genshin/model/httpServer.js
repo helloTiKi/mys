@@ -79,6 +79,11 @@ watcher.on('change', async (filePath, stats) => {
     }
     await sleep(500)
     let file = "/" + path.relative(_path, filePath).replace(/\\/g, '/');
+    if (!fs.existsSync(filePath)) {
+        delete pathHash[file]
+        console.log(`文件 ${file} 被删除`);
+        return
+    }
     const newData = fs.readFileSync(filePath);
     const newMd5 = md5sum(newData);
     if (pathHash[file]) {
@@ -285,6 +290,6 @@ export default class httpServer {
         } else set(method, func);
     }
     getFileHash(path) {
-        return pathHash[path]
+        return pathHash[path] || ""
     }
 };

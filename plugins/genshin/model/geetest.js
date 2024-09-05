@@ -52,7 +52,7 @@ export default class geetest {
         let ret = this.server.getCaptchaHtmlUrl(this.config.gt, this.config.challenge)
         let data = await axios.get('http://127.0.0.1:4400/check', {
             headers: {
-                geetest: ret.url
+                geetest: "http://127.0.0.1:4399/captcha/index.html?sign=" + ret.sign
             }
         })
         let _data = data.data;

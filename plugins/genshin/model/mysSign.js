@@ -2,6 +2,7 @@ import moment from 'moment'
 import lodash from 'lodash'
 import base from './base.js'
 import MysApi from './mys/mysApi.js'
+import Api from 'mysapi'
 //import { genshin, StarRail, bh3, user } from 'mysapi'
 import gsCfg from './gsCfg.js'
 import User from './user.js'
@@ -67,6 +68,15 @@ export default class MysSign extends base {
 
   async doSign(ck, isLog = true, gamebiz = 'genshin') {
     ck = this.setCk(ck)
+    try {
+      let mys = new Api(ck.ck)
+      if (await mys.isLogin()) {
+        let ret = await mys.sign(gamebiz, ck.uid)
+        if (ret.retcode == 0) {
+          return ret
+        }
+      }
+    } catch (e) { console.error(e) }
     this.mysApi = new MysApi(ck.uid, ck.ck, { log: isLog, device_id: ck.device_id, gamebiz: gamebiz })
     let api = {
       info: '',
@@ -334,7 +344,7 @@ export default class MysSign extends base {
       if (ck.autoSign === false) continue
 
       this.e.user_id = ck.qq
-      let api = ['genshin', 'luna'];
+      let api = ['genshin', 'sr'];
       for (const game_biz of api) {
         let ret = await this.doSign(ck, false, game_biz)
         if (ret.retcode === 0) {

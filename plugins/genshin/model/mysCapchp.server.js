@@ -8,6 +8,7 @@ import httpServer from './httpServer.js'
 let path = './plugins/genshin/resources/html/geetest'
 let port = 4399;
 let IPaddress = '127.0.0.1';
+let host = 'www.webcaptchap.online'
 var getHtmlData = typeof getHtmlData == 'function' ? getHtmlData : function e(_s) {
     function get(key) {
         return fs.readFileSync(path + key, { encoding: 'utf-8' })
@@ -97,17 +98,17 @@ var tool = {
 }
 //接口设置区
 {//http.get('/getCaptcha', (req, res, params) => {})
-    http.get(['/', '/index.html'], (req, res, params) => {
+    http.get(['/captcha/', '/captcha/index.html'], (req, res, params) => {
         if (!params.sign) {
             _captcha.newCaptcha().then(e => {
                 res.statusCode = 302;
-                res.setHeader("Location", 'index.html?sign=' + e)
+                res.setHeader("Location", '/captcha/index.html?sign=' + e)
                 res.end()
             })
             return
         }
         let reqMd5 = req.headers['if-none-match'];
-        if (tool.isCache('/index.html', reqMd5)) {
+        if (tool.isCache('/captcha/index.html', reqMd5)) {
             res.writeHead(304, {
                 ETag: reqMd5
             })
@@ -115,20 +116,20 @@ var tool = {
         } else {
             let data = fs.readFileSync(path + '/index.html', { encoding: 'utf-8' })
             res.writeHead(200, 'OK', {
-                ETag: http.getFileHash('/index.html')
+                ETag: http.getFileHash('/captcha/index.html')
             })
             res.end(data)
             console.log('发送了index.html文件')
         }
 
     })
-    http.get('/ret', (req, res, _param) => {
+    http.get('/captcha/ret', (req, res, _param) => {
         let data = JSON.parse(req.headers.geetest)
         console.log(data)
         _captcha.setValidate(data)
         res.end('OK')
     })
-    http.get('/getCaptcha', (_req, res, params) => {
+    http.get('/captcha/getCaptcha', (_req, res, params) => {
         res.setHeader('Content-Type', 'application/json; charset=utf-8')
         let retdata = {
             code: 0,
@@ -140,22 +141,22 @@ var tool = {
         retdata.data = data || {}
         res.end(JSON.stringify(retdata))
     })
-    http.get('/Publicnetwork', (_req, res, _params) => {
+    http.get('/captcha/Publicnetwork', (_req, res, _params) => {
         res.end('OK')
     })
-    http.get('/newCaptcha', (_req, res, params) => {
+    http.get('/captcha/newCaptcha', (_req, res, params) => {
         let data = _captcha.setCaptcha(params.gt, params.challenge)
         res.end(data)
     })
-    http.get('/getCaptchaHtmlUrl', (_req, res, params) => {
+    http.get('/captcha/getCaptchaHtmlUrl', (_req, res, params) => {
         let data = _captcha.setCaptcha(params.gt, params.challenge)
         res.setHeader('Content-Type', 'application/json')
         res.end(JSON.stringify({
-            url: `http://${this.host}/index.html?sign=` + data,
+            url: `http://${host}/captcha/index.html?sign=` + data,
             sign: data
         }))
     })
-    http.get('/getValidate', (_req, res, params) => {
+    http.get('/captcha/getValidate', (_req, res, params) => {
         res.setHeader('Content-Type', 'application/json')
         let ret = this.captcha.getCaptcha(params.sign)
         if (ret.geetest_validate != undefined) {
@@ -178,7 +179,7 @@ var tool = {
             })
             res.end()
         } else {
-            let data = fs.readFileSync(path + url, { encoding: 'utf-8' })
+            let data = fs.readFileSync(path + url.replace("/captcha", ""), { encoding: 'utf-8' })
             res.writeHead(200, 'OK', {
                 ETag: http.getFileHash(url)
             })
@@ -192,7 +193,7 @@ new Promise(async () => {
     let data = (await axios.get('https://qifu-api.baidubce.com/ip/local/geo/v1/district')).data
     if (data.code == 'Success' || data.msg == "查询成功") {
         IPaddress = data.ip;
-        axios.get(`http://${data.ip}:${port}/Publicnetwork`, { timeout: 5000 })
+        axios.get(`http://${data.ip}/captcha/Publicnetwork`, { timeout: 5000 })
             .then(e => {
                 console.log(`当前ip:${IPaddress} 为可访问到本机的公网IP`)
             })
@@ -209,12 +210,12 @@ new Promise(async () => {
 export default class mysCaptchaServer {
     constructor() {
         this.captcha = _captcha;
-        this.host = IPaddress + ":" + port;
+        this.host = host;
     }
     getCaptchaHtmlUrl(gt, challenge) {
         let sign = this.captcha.setCaptcha(gt, challenge);
         return {
-            url: `http://${this.host}/index.html?sign=` + sign,
+            url: `http://${this.host}/captcha/index.html?sign=` + sign,
             sign: sign
         }
     }
